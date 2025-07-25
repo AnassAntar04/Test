@@ -1,0 +1,290 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* SynergyAI Connect Design System - Samy Conciergerie */
+
+@layer base {
+  :root {
+    /* Core brand colors */
+    --background: 248 250 252; /* #f8fafc */
+    --foreground: 226 30% 13%; /* #1e293b */
+
+    --card: 0 0% 100%; /* #ffffff */
+    --card-foreground: 226 30% 13%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 226 30% 13%;
+
+    /* Primary - Bleu professionnel */
+    --primary: 221 83% 53%; /* #2563eb */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 221 83% 48%;
+    --primary-light: 221 83% 95%;
+
+    /* Secondary - Gris moderne */
+    --secondary: 215 20% 65%; /* #64748b */
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 215 20% 95%;
+
+    /* Accent - Vert succès */
+    --accent: 158 64% 52%; /* #10b981 */
+    --accent-foreground: 0 0% 100%;
+    --accent-light: 158 64% 95%;
+
+    /* Warning - Orange alertes */
+    --warning: 38 92% 50%; /* #f59e0b */
+    --warning-foreground: 0 0% 100%;
+    --warning-light: 38 92% 95%;
+
+    /* Danger - Rouge urgence */
+    --danger: 0 84% 60%; /* #ef4444 */
+    --danger-foreground: 0 0% 100%;
+    --danger-light: 0 84% 95%;
+
+    /* Neutral tones */
+    --muted: 210 40% 96%; /* #f1f5f9 */
+    --muted-foreground: 215 16% 47%; /* #64748b */
+
+    --border: 214 32% 91%; /* #e2e8f0 */
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
+
+    /* Chat specific colors */
+    --chat-bubble-user: 221 83% 53%; /* primary */
+    --chat-bubble-agent: 0 0% 100%; /* white */
+    --chat-bubble-bot: 158 64% 52%; /* accent */
+    --chat-background: 248 250 252;
+    --chat-input: 0 0% 100%;
+
+    /* Status colors */
+    --status-online: 142 76% 36%; /* #16a34a */
+    --status-away: 38 92% 50%; /* warning */
+    --status-busy: 0 84% 60%; /* danger */
+    --status-offline: 215 20% 65%; /* secondary */
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(221 83% 53%), hsl(221 83% 48%));
+    --gradient-success: linear-gradient(135deg, hsl(158 64% 52%), hsl(158 64% 47%));
+    --gradient-dashboard: linear-gradient(135deg, hsl(248 250 252) 0%, hsl(221 83% 98%) 100%);
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    --shadow-chat: 0 2px 8px rgb(0 0 0 / 0.1);
+
+    /* Animations */
+    --transition-fast: all 0.15s ease;
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Dark mode - Samy Conciergerie */
+    --background: 226 30% 7%; /* #0f172a */
+    --foreground: 210 40% 98%;
+
+    --card: 226 30% 10%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 226 30% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 221 83% 58%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 215 20% 25%;
+    --secondary-foreground: 210 40% 98%;
+
+    --accent: 158 64% 47%;
+    --accent-foreground: 0 0% 100%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 0 0% 100%;
+
+    --danger: 0 84% 65%;
+    --danger-foreground: 0 0% 100%;
+
+    --muted: 226 30% 15%;
+    --muted-foreground: 215 16% 65%;
+
+    --border: 226 30% 18%;
+    --input: 226 30% 18%;
+    --ring: 221 83% 58%;
+
+    /* Chat colors dark mode */
+    --chat-bubble-user: 221 83% 58%;
+    --chat-bubble-agent: 226 30% 15%;
+    --chat-bubble-bot: 158 64% 47%;
+    --chat-background: 226 30% 7%;
+    --chat-input: 226 30% 10%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+}
+
+@layer components {
+  /* Chat components */
+  .chat-bubble {
+    @apply rounded-2xl px-4 py-2 max-w-xs break-words shadow-sm;
+  }
+
+  .chat-bubble-user {
+    @apply bg-primary text-primary-foreground ml-auto;
+  }
+
+  .chat-bubble-agent {
+    @apply bg-card text-card-foreground border mr-auto;
+  }
+
+  .chat-bubble-bot {
+    @apply bg-accent text-accent-foreground mr-auto;
+  }
+
+  /* Status indicators */
+  .status-indicator {
+    @apply w-3 h-3 rounded-full border-2 border-white;
+  }
+
+  .status-online {
+    @apply bg-green-500;
+  }
+
+  .status-away {
+    @apply bg-warning;
+  }
+
+  .status-busy {
+    @apply bg-danger;
+  }
+
+  .status-offline {
+    @apply bg-secondary;
+  }
+
+  /* Dashboard cards */
+  .dashboard-card {
+    @apply bg-card rounded-xl p-6 border shadow-sm hover:shadow-md transition-shadow duration-300;
+  }
+
+  /* Enhanced Animations & Micro-interactions */
+  .fade-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  .fade-in-delayed {
+    animation: fadeIn 0.6s ease-out 0.1s both;
+  }
+
+  .fade-in-stagger {
+    animation: fadeIn 0.5s ease-out var(--delay, 0s) both;
+  }
+
+  .slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+
+  .slide-in-right {
+    animation: slideInRight 0.3s ease-out;
+  }
+
+  .scale-in {
+    animation: scaleIn 0.3s ease-out;
+  }
+
+  .bounce-in {
+    animation: bounceIn 0.5s ease-out;
+  }
+
+  .pulse-gentle {
+    animation: pulseGentle 2s ease-in-out infinite;
+  }
+
+  .typing-dots {
+    animation: typingDots 1.4s infinite;
+  }
+
+  .number-roll {
+    animation: numberRoll 0.8s ease-out;
+  }
+
+  .glow-pulse {
+    animation: glowPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideInRight {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes bounceIn {
+    0% { opacity: 0; transform: scale(0.3); }
+    50% { opacity: 1; transform: scale(1.05); }
+    70% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes pulseGentle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  @keyframes typingDots {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-10px); }
+  }
+
+  @keyframes numberRoll {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  @keyframes glowPulse {
+    0%, 100% { box-shadow: 0 0 5px hsl(var(--primary) / 0.3); }
+    50% { box-shadow: 0 0 20px hsl(var(--primary) / 0.6), 0 0 30px hsl(var(--primary) / 0.4); }
+  }
+}
