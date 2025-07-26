@@ -1,4 +1,3 @@
-# SynergyAI Connect - Plateforme de Communication Intelligente
 
 ## Vue d'ensemble du projet
 
