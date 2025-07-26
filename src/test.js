@@ -1,1 +1,0 @@
-const hel = 'Hello, World!';
