@@ -1,7 +1,15 @@
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 import { Search } from "lucide-react";
 import { PROFILE_TYPES } from "@/constants/user-management";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
 interface UserFiltersProps {
   searchTerm: string;
@@ -16,6 +24,24 @@ export const UserFilters = ({
   selectedProfile,
   setSelectedProfile
 }: UserFiltersProps) => {
+  const [Roles, setRoles] = useState([]);
+  const FetchRoles = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("roles")
+        .select("role_id , name ");
+
+      if (error) throw error;
+      setRoles(data || []);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
+
+  useEffect(() => {
+    FetchRoles();
+  }, []);
+  
   return (
     <div className="flex space-x-4">
       <div className="flex-1 relative">
@@ -33,8 +59,10 @@ export const UserFilters = ({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Tous les profils</SelectItem>
-          {Object.entries(PROFILE_TYPES).map(([key, label]) => (
-            <SelectItem key={key} value={key}>{label}</SelectItem>
+          {Roles.map(role => (
+            <SelectItem key={role.role_id} value={role.role_id}>
+              {role.name}
+            </SelectItem>
           ))}
         </SelectContent>
       </Select>

@@ -4,7 +4,13 @@ import { useUserManagement } from "@/hooks/useUserManagement";
 import { UserForm } from "@/components/user-management/UserForm";
 import { UserTable } from "@/components/user-management/UserTable";
 import { UserFilters } from "@/components/user-management/UserFilters";
-import { Profile, UserFormData, UserProfileType, GeographicalZoneType } from "@/types/user-management";
+import {
+  Profile,
+  UserFormData,
+  UserProfileType,
+  GeographicalZoneType
+} from "@/types/user-management";
+import { supabase } from "@/integrations/supabase/client";
 
 export const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,11 +22,11 @@ export const UserManagement = () => {
     first_name: "",
     last_name: "",
     phone: "",
-    profile_type: "agent",
+    profile_type: "",
     geographical_zones: ["paris_centre"],
     is_active: true
   });
-  
+
   const {
     profiles,
     loading,
@@ -42,12 +48,52 @@ export const UserManagement = () => {
     });
   };
 
-  const handleFormSubmit = async (formData: UserFormData, isEdit: boolean, userId?: string) => {
-    if (isEdit && userId) {
-      await updateUser(userId, formData);
-    } else {
-      await createUser(formData);
+  const handleFormSubmit = async (
+    formData: UserFormData,
+    isEdit: boolean,
+    userId?: string
+  ) => {
+    // if (isEdit && userId) {
+    //   await updateUser(userId, formData);
+    // } else {
+    //   await createUser(formData);
+    // }
+
+    try {
+      const { data: OrganisationInfo, error: ErrorOrganisationInfo } =
+        await supabase.from("organisation").select("org_id").single();
+
+      if (OrganisationInfo.org_id) {
+        const { data, error } = await supabase.auth.signUp({
+          email: formData.email,
+          password: "admin123456"
+        });
+
+        alert(error);
+
+        const { data: User, error: ErrorUser } = await supabase
+          .from("profiles")
+          .insert({
+            org_id: OrganisationInfo.org_id,
+            auth_user_id : data?.user?.id,
+            email: formData.email,
+            first_name: formData.first_name,
+            last_name: formData.last_name,
+            phone: formData.phone,
+            role_id: formData.profile_type,
+            geographical_zones: formData.geographical_zones,
+            locale: formData.geographical_zones,
+            is_active: formData.is_active,
+            hashed_pw: "test"
+          });
+
+          // console.log("Profiles Data:", profiles);
+      }
+    } catch (error) {
+      console.error("Error fetching organisation info:", error);
     }
+
+    // console.log("Form submitted:", formData);
     setEditingUser(null);
     setIsDialogOpen(false);
     resetForm();
@@ -73,13 +119,16 @@ export const UserManagement = () => {
     setIsDialogOpen(true);
   };
 
-  const filteredProfiles = profiles.filter(profile => {
-    const matchesSearch = 
+  const filteredProfiles = profiles.filter((profile) => {
+    const matchesSearch =
       profile.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      `${profile.first_name} ${profile.last_name}`.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesProfile = selectedProfile === "all" || profile.profile_type === selectedProfile;
-    
+      `${profile.first_name} ${profile.last_name}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+
+    const matchesProfile =
+      selectedProfile === "all" || profile.role_id === selectedProfile;
+
     return matchesSearch && matchesProfile;
   });
 
@@ -98,10 +147,12 @@ export const UserManagement = () => {
           <Users className="h-8 w-8 text-primary" />
           <div>
             <h1 className="text-3xl font-bold">Gestion des utilisateurs</h1>
-            <p className="text-muted-foreground">Gérez les profils et permissions des utilisateurs</p>
+            <p className="text-muted-foreground">
+              Gérez les profils et permissions des utilisateurs
+            </p>
           </div>
         </div>
-        <UserForm 
+        <UserForm
           editingUser={editingUser}
           onSubmit={handleFormSubmit}
           isDialogOpen={isDialogOpen}

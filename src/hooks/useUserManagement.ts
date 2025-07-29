@@ -15,20 +15,12 @@ export const useUserManagement = () => {
     const loadProfiles = async () => {
       setLoading(true);
 
-      // if (shouldUseMock) {
-      //   // Simuler un délai de chargement
-      //   await new Promise(resolve => setTimeout(resolve, 500));
-      //   setProfiles(mockProfiles);
-      // } else {
-      //   // Ici on intégrerait la vraie API Supabase
-      //   // const { data } = await supabase.from('profiles').select('*');
-      //   // setProfiles(data || []);
-      //   setProfiles(mockProfiles); // Fallback temporaire
-      // }
-
       try {
         // Ici on intégrerait la vraie API Supabase
-        const { data } = await supabase.from("profiles").select("*");
+        const { data } = await supabase
+          .from("profiles")
+          .select("* , roles(*)")
+          .order("created_at", { ascending: false });
         setProfiles(data || []);
         // setProfiles(mockProfiles); // Fallback temporaire
       } catch (error) {
@@ -40,7 +32,29 @@ export const useUserManagement = () => {
       setLoading(false);
     };
 
-    loadProfiles();
+    loadProfiles(); // Realtime subscription
+    const channel = supabase
+      .channel("profiles-updates")
+      .on(
+        "postgres_changes",
+        {
+          event: "*", // 'INSERT' | 'UPDATE' | 'DELETE' | '*'
+          schema: "public",
+          table: "profiles"
+        },
+        (payload) => {
+          console.log("🔄 Change detected:", payload);
+
+          // Auto-refresh data
+          loadProfiles();
+        }
+      )
+      .subscribe();
+
+    // Cleanup on component unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [shouldUseMock]);
 
   const createUser = async (userData: UserFormData) => {
@@ -82,9 +96,6 @@ export const useUserManagement = () => {
         email: newProfile.email,
         password: "admin123456"
       });
-
-
-      
 
       // const { data, error } = await supabase
       //   .from("profiles")
@@ -132,17 +143,11 @@ export const useUserManagement = () => {
 
   const toggleUserStatus = async (userId: string, currentStatus: boolean) => {
     if (shouldUseMock) {
-      setProfiles((prev) =>
-        prev.map((profile) =>
-          profile.id === userId
-            ? {
-                ...profile,
-                is_active: !currentStatus,
-                updated_at: new Date().toISOString()
-              }
-            : profile
-        )
-      );
+      const { data, error } = await supabase
+        .from("profiles")
+        .update({ is_active: !currentStatus })
+        .eq("user_id", userId);
+
       toast({
         title: "Statut modifié",
         description: `L'utilisateur a été ${

@@ -19,7 +19,7 @@ export const usePermissions = () => {
   const [error, setError] = useState<string | null>(null);
 
 
-  console.log('usePermissions: Initializing permissions hook', { user, userRole });
+  // console.log('usePermissions: Initializing permissions hook', { user, userRole });
 
 
   const fetchUserPermissions = async () => {

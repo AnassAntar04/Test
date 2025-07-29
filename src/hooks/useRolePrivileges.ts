@@ -20,8 +20,7 @@ export const useRolePrivileges = () => {
     try {
       const { data, error } = await supabase
         .from('permissions')
-        .select('*')
-        .order('category', { ascending: true });
+        .select('*');
 
       if (error) throw error;
       setPermissions(data || []);
@@ -40,21 +39,26 @@ export const useRolePrivileges = () => {
       const { data, error } = await supabase
         .from('role_permissions')
         .select(`
-          role,
-          permission_id,
-          permissions:permission_id (
-            id,
+          role_id,
+          perm_id,
+          roles:role_id(
+            role_id,
+            name
+          ),
+          permissions:perm_id (
+            perm_id,
             name,
             description,
-            category
+            code
           )
         `);
 
+        // console.log('Fetched role privileges:', data);
       if (error) throw error;
       
       const mappedData: RolePrivilege[] = (data || []).map(item => ({
-        role: item.role as AppRole,
-        permission_id: item.permission_id,
+        role: item.roles?.role_id,
+        permission_id: item.perm_id,
         permission: item.permissions as Permission
       }));
       
@@ -64,15 +68,15 @@ export const useRolePrivileges = () => {
     }
   };
 
-  const toggleRolePrivilege = async (role: AppRole, permissionId: string, hasPrivilege: boolean) => {
+  const toggleRolePrivilege = async (role : string , permissionId: string, hasPrivilege: boolean) => {
     try {
       if (hasPrivilege) {
         // Remove privilege
         const { error } = await supabase
           .from('role_permissions')
           .delete()
-          .eq('role', role)
-          .eq('permission_id', permissionId);
+          .eq('role_id', role)
+          .eq('perm_id', permissionId);
 
         if (error) throw error;
       } else {
@@ -80,8 +84,8 @@ export const useRolePrivileges = () => {
         const { error } = await supabase
           .from('role_permissions')
           .insert({
-            role,
-            permission_id: permissionId
+            role_id: role,
+            perm_id: permissionId
           });
 
         if (error) throw error;
@@ -109,16 +113,17 @@ export const useRolePrivileges = () => {
   };
 
   const hasRolePrivilege = (role: AppRole, permissionId: string): boolean => {
+    console.log('Role Privileges:', rolePrivileges);
     return rolePrivileges.some(rp => rp.role === role && rp.permission_id === permissionId);
   };
 
   const getPermissionsByCategory = () => {
     const grouped: Record<string, Permission[]> = {};
     permissions.forEach(permission => {
-      if (!grouped[permission.category]) {
-        grouped[permission.category] = [];
+      if (!grouped[permission.name]) {
+        grouped[permission.name] = [];
       }
-      grouped[permission.category].push(permission);
+      grouped[permission.name].push(permission);
     });
     return grouped;
   };

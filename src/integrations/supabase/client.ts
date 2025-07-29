@@ -5,8 +5,14 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://supabase.iits.ma/";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiZXhwIjoyMDY3NTA1NzYxLCJpYXQiOjE3NTIxNDU3NjF9.ZLVdMVawJ2r5oCxFyaUObI-wnGEsyqIhBDH6f3oJLoU";
 
+
+
+// const SUPABASE_URL ='https://sesmczumuqhheyobwffv.supabase.co' ; 
+// const SUPABASE_PUBLISHABLE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNlc21jenVtdXFoaGV5b2J3ZmZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTYxNDIsImV4cCI6MjA2OTI5MjE0Mn0.EHOj8n_q08P1aTWLlrd_cfFjccYp6e2s_w7rROOu6gw';
+
+
 // Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
+// import { supabase } fro m "@/integrations/supabase/client";
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {

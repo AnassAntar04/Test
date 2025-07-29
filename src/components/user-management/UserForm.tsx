@@ -1,18 +1,40 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus } from "lucide-react";
-import { Profile, UserFormData, UserProfileType, GeographicalZoneType } from "@/types/user-management";
+import {
+  Profile,
+  UserFormData,
+  UserProfileType,
+  GeographicalZoneType
+} from "@/types/user-management";
 import { PROFILE_TYPES, GEOGRAPHICAL_ZONES } from "@/constants/user-management";
+import { supabase } from "@/integrations/supabase/client";
 
 interface UserFormProps {
   editingUser: Profile | null;
-  onSubmit: (formData: UserFormData, isEdit: boolean, userId?: string) => Promise<void>;
+  onSubmit: (
+    formData: UserFormData,
+    isEdit: boolean,
+    userId?: string
+  ) => Promise<void>;
   isDialogOpen: boolean;
   setIsDialogOpen: (open: boolean) => void;
   formData: UserFormData;
@@ -20,16 +42,16 @@ interface UserFormProps {
   onNewUser?: () => void;
 }
 
-export const UserForm = ({ 
-  editingUser, 
-  onSubmit, 
-  isDialogOpen, 
-  setIsDialogOpen, 
-  formData, 
+export const UserForm = ({
+  editingUser,
+  onSubmit,
+  isDialogOpen,
+  setIsDialogOpen,
+  formData,
   setFormData,
-  onNewUser 
+  onNewUser
 }: UserFormProps) => {
-  
+  const [Roles, setRoles] = useState([]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await onSubmit(formData, !!editingUser, editingUser?.id);
@@ -44,11 +66,35 @@ export const UserForm = ({
     } else {
       setFormData({
         ...formData,
-        geographical_zones: formData.geographical_zones.filter(z => z !== zone)
+        geographical_zones: formData.geographical_zones.filter(
+          (z) => z !== zone
+        )
       });
     }
   };
 
+  const FetchRoles = async () => {
+
+    try {
+      const { data, error } = await supabase
+        .from("roles")
+        .select("role_id , name ");
+
+
+      if (error) throw error;
+      setRoles(data || []);
+
+
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
+
+  useEffect(() => {
+    FetchRoles();
+  }, []);
+
+  // console.log("UserForm: Roles fetched", formData);
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
@@ -59,7 +105,9 @@ export const UserForm = ({
       </DialogTrigger>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{editingUser ? 'Modifier' : 'Créer'} un utilisateur</DialogTitle>
+          <DialogTitle>
+            {editingUser ? "Modifier" : "Créer"} un utilisateur
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -69,21 +117,37 @@ export const UserForm = ({
                 id="email"
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
                 required
                 disabled={!!editingUser}
               />
             </div>
             <div>
               <Label htmlFor="profile_type">Profil</Label>
-              <Select value={formData.profile_type} onValueChange={(value: UserProfileType) => setFormData({...formData, profile_type: value})}>
+              <Select
+                value={formData.profile_type}
+                onValueChange={(value: UserProfileType) =>
+                  setFormData({ ...formData, profile_type: value })
+                }
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(PROFILE_TYPES).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>{label}</SelectItem>
-                  ))}
+                  {/* {Object.entries(PROFILE_TYPES).map(([key, label]) => (
+                    <SelectItem key={key} value={key}>
+                      {label}
+                    </SelectItem>
+                  ))} */}
+                  {
+                    Roles.map((role: any) => (
+                      <SelectItem key={role.role_id} value={role.role_id}>
+                        {role.name}
+                      </SelectItem>
+                    ))
+                  }
                 </SelectContent>
               </Select>
             </div>
@@ -95,7 +159,9 @@ export const UserForm = ({
               <Input
                 id="first_name"
                 value={formData.first_name}
-                onChange={(e) => setFormData({...formData, first_name: e.target.value})}
+                onChange={(e) =>
+                  setFormData({ ...formData, first_name: e.target.value })
+                }
               />
             </div>
             <div>
@@ -103,7 +169,9 @@ export const UserForm = ({
               <Input
                 id="last_name"
                 value={formData.last_name}
-                onChange={(e) => setFormData({...formData, last_name: e.target.value})}
+                onChange={(e) =>
+                  setFormData({ ...formData, last_name: e.target.value })
+                }
               />
             </div>
           </div>
@@ -113,7 +181,9 @@ export const UserForm = ({
             <Input
               id="phone"
               value={formData.phone}
-              onChange={(e) => setFormData({...formData, phone: e.target.value})}
+              onChange={(e) =>
+                setFormData({ ...formData, phone: e.target.value })
+              }
             />
           </div>
 
@@ -124,10 +194,16 @@ export const UserForm = ({
                 <div key={key} className="flex items-center space-x-2">
                   <Checkbox
                     id={key}
-                    checked={formData.geographical_zones.includes(key as GeographicalZoneType)}
-                    onCheckedChange={(checked) => handleZoneChange(key as GeographicalZoneType, !!checked)}
+                    checked={formData.geographical_zones.includes(
+                      key as GeographicalZoneType
+                    )}
+                    onCheckedChange={(checked) =>
+                      handleZoneChange(key as GeographicalZoneType, !!checked)
+                    }
                   />
-                  <Label htmlFor={key} className="text-sm">{label}</Label>
+                  <Label htmlFor={key} className="text-sm">
+                    {label}
+                  </Label>
                 </div>
               ))}
             </div>
@@ -136,18 +212,22 @@ export const UserForm = ({
           <div className="flex items-center space-x-2">
             <Switch
               checked={formData.is_active}
-              onCheckedChange={(checked) => setFormData({...formData, is_active: checked})}
+              onCheckedChange={(checked) =>
+                setFormData({ ...formData, is_active: checked })
+              }
             />
             <Label>Utilisateur actif</Label>
           </div>
 
           <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsDialogOpen(false)}
+            >
               Annuler
             </Button>
-            <Button type="submit">
-              {editingUser ? 'Modifier' : 'Créer'}
-            </Button>
+            <Button type="submit">{editingUser ? "Modifier" : "Créer"}</Button>
           </div>
         </form>
       </DialogContent>
