@@ -64,7 +64,7 @@ export const usePermissions = () => {
         .eq('auth_user_id', user.id)
         .single();
 
-        console.log('usePermissions: Fetched role ID:', RoleId);
+        // console.log('usePermissions: Fetched role ID:', RoleId);
 
       // console.log('usePermissions: Fetched role ID:', user.id);
       // Regular role permission fetching
@@ -81,7 +81,7 @@ export const usePermissions = () => {
         `)
         .eq('role_id', RoleId.role_id);
 
-        console.log('usePermissions: Fetched role permissions:', data);
+        // console.log('usePermissions: Fetched role permissions:', data);
 
       if (error) {
         console.error('Error fetching role permissions:', error);
@@ -92,7 +92,7 @@ export const usePermissions = () => {
         ?.filter(item => item.permissions !== null)
         ?.map(item => item.permissions!.code) || [];
       
-      console.log('usePermissions: Regular role permissions:', userPermissions);
+      // console.log('usePermissions: Regular role permissions:', userPermissions);
       setPermissions(userPermissions);
       // console.log('usePermissions: Regular role permissions:', permissions);
 

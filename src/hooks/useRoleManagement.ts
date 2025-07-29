@@ -12,7 +12,7 @@ export const useRoleManagement = () => {
   const fetchUserRoles = async () => {
     try {
       const { data, error } = await supabase
-        .from('user_roles')
+        .from('profiles')
         .select('*')
         .eq('is_active', true)
         .order('created_at', { ascending: false });
@@ -60,7 +60,7 @@ export const useRoleManagement = () => {
         _user_id: userId,
         _role: role,
         _assigned_by: user.id,
-        _expires_at: expiresAt || null
+        _expires_at: expiresAt || null  
       });
 
       if (error) throw error;

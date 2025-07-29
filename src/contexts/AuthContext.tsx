@@ -63,13 +63,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         .single();
 
 
-      // const {data : UserData, error: userError} = await supabase
-      // .from("roles")
-      // .select("name")
-      // .eq("id", data.roles_id)
+      const {data : UserData, error: userError} = await supabase
+      .from("roles")
+      .select("name")
+      .eq("role_id", data.role_id);
 
         
-      // console.log("AuthContext: Role fetch result:", data);
+      console.log("AuthContext: Role fetch result:", UserData);
       if (error && error.code !== "PGRST116") {
         console.error("Error fetching user role:", error);
         throw error;

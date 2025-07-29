@@ -49,8 +49,8 @@ export const RoleManagement = () => {
   console.log("RoleManagement: Rendering with userRoles:", ROLE_LABELS['administrateur']);
 
   // Compter les utilisateurs par rôle
-  const getUserCountForRole = (role: AppRole) => {
-    return userRoles.filter((ur) => ur.role === role && ur.is_active).length;
+  const getUserCountForRole = (role: string) => {
+    return userRoles.filter((ur) => ur.role_id === role && ur.is_active).length;
   };
 
   const handleCreateRole = async () => {
@@ -67,12 +67,14 @@ export const RoleManagement = () => {
     try {
       // Note: En production, il faudrait modifier l'enum PostgreSQL
       // Pour l'instant, on simule la création en ajoutant à nos constantes locales
-      toast({
-        title: "Limitation technique",
-        description:
-          "La création de nouveaux rôles nécessite une modification de la base de données. Cette fonctionnalité sera bientôt disponible.",
-        variant: "destructive"
-      });
+      const {data : OrganisationInfo, error: ErrorOrganisationInfo} = await supabase.from("organisation").select("*").single();
+      const { data, error } = await supabase
+        .from("roles")
+        .insert({
+          name: newRoleName,
+          description: newRoleKey,
+          org_id: OrganisationInfo.org_id
+        });
 
       setNewRoleName("");
       setNewRoleKey("");
@@ -180,10 +182,10 @@ export const RoleManagement = () => {
         <CardContent>
           <div className="space-y-3">
             {Roles.map((role , level) => {
-              const userCount = getUserCountForRole(role);
+              const userCount = getUserCountForRole(role.role_id);
               const canDelete =
                 userCount === 0 &&
-                !["super_admin", "administrateur"].includes(role);
+                !["super_admin", "administrateur" , "Owner" , "Supervisor"].includes(role);
 
               return (
                 <div
@@ -194,10 +196,10 @@ export const RoleManagement = () => {
                     <Shield className="h-4 w-4 text-primary" />
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">{ROLE_LABELS[role.name]}</span>
-                        <Badge variant="outline" className="text-xs">
+                        <span className="font-medium">{role.name}</span>
+                        {/* <Badge variant="outline" className="text-xs">
                           Niveau {level}
-                        </Badge>
+                        </Badge> */}
                       </div>
                       <div className="flex items-center gap-1 text-sm text-muted-foreground">
                         <Users className="h-3 w-3" />

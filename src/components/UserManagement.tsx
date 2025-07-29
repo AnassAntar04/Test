@@ -4,6 +4,7 @@ import { useUserManagement } from "@/hooks/useUserManagement";
 import { UserForm } from "@/components/user-management/UserForm";
 import { UserTable } from "@/components/user-management/UserTable";
 import { UserFilters } from "@/components/user-management/UserFilters";
+import axios from "axios";
 import {
   Profile,
   UserFormData,
@@ -61,21 +62,33 @@ export const UserManagement = () => {
 
     try {
       const { data: OrganisationInfo, error: ErrorOrganisationInfo } =
-        await supabase.from("organisation").select("org_id").single();
+        await supabase.from("organisation").select("*").single();
 
       if (OrganisationInfo.org_id) {
-        const { data, error } = await supabase.auth.signUp({
-          email: formData.email,
-          password: "admin123456"
-        });
+        // const { data, error } = await supabase.auth.signUp({
+        //   email: formData.email,
+        //   password: ""
+        // });
 
-        alert(error);
+        const res = await axios.post(
+          "https://supabase.iits.ma/functions/v1/create-user",
+          {
+            email: formData.email,
+            password: OrganisationInfo.name
+          },
+          {
+            headers: {
+              "Content-Type": "application/json"
+            }
+          }
+        );
+
 
         const { data: User, error: ErrorUser } = await supabase
           .from("profiles")
           .insert({
             org_id: OrganisationInfo.org_id,
-            auth_user_id : data?.user?.id,
+            auth_user_id: res.data?.user?.id,
             email: formData.email,
             first_name: formData.first_name,
             last_name: formData.last_name,
@@ -86,8 +99,7 @@ export const UserManagement = () => {
             is_active: formData.is_active,
             hashed_pw: "test"
           });
-
-          // console.log("Profiles Data:", profiles);
+          
       }
     } catch (error) {
       console.error("Error fetching organisation info:", error);
