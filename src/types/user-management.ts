@@ -8,8 +8,8 @@ export interface Profile {
   first_name: string | null;
   last_name: string | null;
   phone: string | null;
-  profile_type: UserProfileType;
-  geographical_zones: GeographicalZoneType[];
+  profile_type: string;
+  geographical_zones: string | string[]; // Can be a single string or an array of strings
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -23,11 +23,13 @@ export interface Permission {
 }
 
 export interface UserFormData {
+  id?: string; // Optional for new users
+  user_id?: string; // Optional for new users
   email: string;
   first_name: string;
   last_name: string;
   phone: string;
-  profile_type: UserProfileType;
-  geographical_zones: GeographicalZoneType[];
+  profile_type: string ;
+  geographical_zones: string | string[]; // Can be a single string or an array of strings
   is_active: boolean;
 }

@@ -6,19 +6,21 @@ import { UserRole, AppRole } from "@/types/roles";
 export const useRoleManagement = () => {
   const [userRoles, setUserRoles] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentUserRole, setCurrentUserRole] = useState<AppRole | null>(null);
+  const [currentUserRole, setCurrentUserRole] = useState<string>(null);
   const { toast } = useToast();
+
 
   const fetchUserRoles = async () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('* , roles(role_id , name)')
         .eq('is_active', true)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       setUserRoles(data || []);
+      // console.log("Fetched user roles:", data);
     } catch (error) {
       console.error('Error fetching user roles:', error);
       toast({
@@ -28,6 +30,7 @@ export const useRoleManagement = () => {
       });
     }
   };
+  
 
   const getCurrentUserRole = async () => {
     try {
@@ -35,16 +38,16 @@ export const useRoleManagement = () => {
       if (!user) return;
 
       const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
+        .from('profiles')
+        .select('role_id , roles(name)')
+        .eq('auth_user_id', user.id)
         .eq('is_active', true)
         .order('created_at', { ascending: false })
         .limit(1)
         .single();
 
       if (error && error.code !== 'PGRST116') throw error;
-      setCurrentUserRole(data?.role || null);
+      setCurrentUserRole(data?.roles?.name || null);
     } catch (error) {
       console.error('Error fetching current user role:', error);
     }
@@ -84,10 +87,9 @@ export const useRoleManagement = () => {
   const removeRole = async (userId: string, role: AppRole) => {
     try {
       const { error } = await supabase
-        .from('user_roles')
+        .from('profiles')
         .update({ is_active: false })
-        .eq('user_id', userId)
-        .eq('role', role);
+        .eq('user_id', userId);
 
       if (error) throw error;
 
@@ -108,9 +110,10 @@ export const useRoleManagement = () => {
   };
 
   const getUserRoles = (userId: string): AppRole[] => {
+    // console.log('Fetching user roles for user:', userId);
     return userRoles
       .filter(ur => ur.user_id === userId && ur.is_active)
-      .map(ur => ur.role);
+      .map(ur => ur.roles?.name);
   };
 
   const canManageUser = (targetUserId: string): boolean => {
@@ -120,29 +123,34 @@ export const useRoleManagement = () => {
     const currentRoleLevel = getRoleLevel(currentUserRole);
     
     // Admins can manage everyone
-    if (currentUserRole === 'administrateur' || currentUserRole === 'super_admin') {
+    if (currentUserRole === 'administrateur' || currentUserRole === 'super_admin' || currentUserRole === 'Owner') {
       return true;
     }
     
     // Supervisors can manage users with lower-level roles only
-    if (currentUserRole === 'superviseur') {
+    if (currentUserRole === 'superviseur' || currentUserRole === 'Supervisor') {
       return targetRoles.every(role => getRoleLevel(role) < currentRoleLevel);
     }
     
     return false;
   };
 
-  const getRoleLevel = (role: AppRole): number => {
+  const getRoleLevel = (role: string): number => {
     const levels = {
       super_admin: 9,
+      Owner: 9,
       administrateur: 8,
       superviseur: 7,
+      Supervisor: 7,
       responsable_logistique: 6,
       responsable_qualite: 5,
       technicien: 4,
+      Technician: 4,
       agent: 3,
+      'Supper Agent': 3,
       comptabilite: 2,
-      femme_de_menage: 1
+      femme_de_menage: 1,
+      Janitor: 1
     };
     return levels[role] || 0;
   };

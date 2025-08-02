@@ -164,7 +164,11 @@ export const useUserManagement = () => {
 
   const deleteUser = async (userId: string) => {
     if (shouldUseMock) {
-      setProfiles((prev) => prev.filter((profile) => profile.id !== userId));
+      // setProfiles((prev) => prev.filter((profile) => profile.id !== userId));
+      const { data, error } = await supabase
+        .from("profiles")
+        .delete()
+        .eq("user_id", userId);
       toast({
         title: "Utilisateur supprimé",
         description: "L'utilisateur a été supprimé définitivement."

@@ -41,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchUserRole = async (userId: string) => {
     try {
-      console.log("AuthContext: Fetching role for user:", userId);
+      // console.log("AuthContext: Fetching role for user:", userId);
 
       // const { data, error } = await supabase
       //   .from("user_roles")
@@ -69,16 +69,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       .eq("role_id", data.role_id);
 
         
-      console.log("AuthContext: Role fetch result:", UserData);
+      // console.log("AuthContext: Role fetch result:", UserData);
       if (error && error.code !== "PGRST116") {
         console.error("Error fetching user role:", error);
         throw error;
       }
 
-      console.log("AuthContext: User role fetched:", data);
+      // console.log("AuthContext: User role fetched:", data);
       // const role = data?.role || null ;
       const role = data?.roles?.name == 'Owner' ? 'super_admin' : data?.roles?.name;
-      console.log("AuthContext: User role fetched:", role);
+      // console.log("AuthContext: User role fetched:", role);
       setUserRole(role);
     } catch (error) {
       console.error("Error fetching user role:", error);
@@ -94,7 +94,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setSession(session);
       setUser(session?.user ?? null);
 
-      console.log("AuthContext: Auth state changed:", event, session);
+      // console.log("AuthContext: Auth state changed:", event, session);
       if (session?.user) {
         setTimeout(() => {
           fetchUserRole(session.user.id);

@@ -38,6 +38,8 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from "@/components/ui/tooltip";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface UserTableProps {
   profiles: Profile[];
@@ -52,12 +54,13 @@ export const UserTable = ({
   onToggleStatus,
   onDeleteUser
 }: UserTableProps) => {
-  console.log("UserTable: Rendering with profiles:", profiles);
+  // console.log("UserTable: Rendering with profiles:", profiles);
   const [roleDialogOpen, setRoleDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
   const { getUserRoles, canManageUser, removeRole } = useRoleManagement();
+  const { user, userRole } = useAuth();
 
-  console.log("Profiles in UserTable:", profiles);
+  // console.log("UserTable: User role:", userRole);
   return (
     <Card>
       <CardHeader>
@@ -77,11 +80,11 @@ export const UserTable = ({
           </TableHeader>
           <TableBody>
             {profiles.map((profile) => (
-              <TableRow key={profile.id}>
+              <TableRow key={profile.user_id}>
                 <TableCell>
                   <div>
                     <div className="font-medium">
-                      {profile.first_name} {profile.last_name}
+                      {profile.first_name} {profile.last_name} <span className="text-blue-700" >{profile.auth_user_id == user.id ? "( Vous )" : ""}</span>
                     </div>
                     <div className="text-sm text-muted-foreground">
                       {profile.email}
@@ -96,7 +99,8 @@ export const UserTable = ({
                     {/* {profile.geographical_zones.map((zone) => ( */}
                     <Badge variant="outline" className="text-xs">
                       <MapPin className="h-3 w-3 mr-1" />
-                      {profile.locale}
+                      {profile.geographical_zones} -{" "}
+                      {profile.locale.toUpperCase()}
                     </Badge>
                     {/* ))} */}
                   </div>
@@ -140,7 +144,7 @@ export const UserTable = ({
                   </div> */}
                   <Badge variant="outline" className="text-xs">
                     <Shield className="h-3 w-3 mr-1" />
-                    {profile.roles?.name}
+                    {profile.roles?.description}
                   </Badge>
                 </TableCell>
                 <TableCell>
@@ -154,20 +158,24 @@ export const UserTable = ({
                 <TableCell>
                   <TooltipProvider>
                     <div className="flex space-x-2">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onEditUser(profile)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Modifier l'utilisateur</p>
-                        </TooltipContent>
-                      </Tooltip>
+                      {(canManageUser(profile.user_id) || profile.auth_user_id == user.id  ) && (
+                        <>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => onEditUser(profile)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Modifier l'utilisateur</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </>
+                      )}
                       {canManageUser(profile.user_id) && (
                         <>
                           <Tooltip>
@@ -216,7 +224,7 @@ export const UserTable = ({
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Annuler</AlertDialogCancel>
                                 <AlertDialogAction
-                                  onClick={() => onDeleteUser(profile.id)}
+                                  onClick={() => onDeleteUser(profile.user_id)}
                                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                 >
                                   Supprimer

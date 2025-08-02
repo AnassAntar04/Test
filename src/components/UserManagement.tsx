@@ -12,6 +12,7 @@ import {
   GeographicalZoneType
 } from "@/types/user-management";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 export const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,10 +24,11 @@ export const UserManagement = () => {
     first_name: "",
     last_name: "",
     phone: "",
-    profile_type: "",
-    geographical_zones: ["paris_centre"],
-    is_active: true
-  });
+    profile_type: "Default",
+    geographical_zones: "",
+    is_active: true,
+    locale: ""
+  } as UserFormData);
 
   const {
     profiles,
@@ -43,10 +45,11 @@ export const UserManagement = () => {
       first_name: "",
       last_name: "",
       phone: "",
-      profile_type: "agent",
-      geographical_zones: ["paris_centre"],
-      is_active: true
-    });
+      profile_type: "Default",
+      geographical_zones: "",
+      is_active: true,
+      locale: ""
+    } as UserFormData);
   };
 
   const handleFormSubmit = async (
@@ -54,55 +57,85 @@ export const UserManagement = () => {
     isEdit: boolean,
     userId?: string
   ) => {
-    // if (isEdit && userId) {
-    //   await updateUser(userId, formData);
-    // } else {
-    //   await createUser(formData);
-    // }
+    const submittedData = formData as any;
 
     try {
       const { data: OrganisationInfo, error: ErrorOrganisationInfo } =
         await supabase.from("organisation").select("*").single();
 
+        // console.log('Submitted Data:', submittedData);
       if (OrganisationInfo.org_id) {
         // const { data, error } = await supabase.auth.signUp({
         //   email: formData.email,
         //   password: ""
         // });
 
-        const res = await axios.post(
-          "https://supabase.iits.ma/functions/v1/create-user",
-          {
-            email: formData.email,
-            password: OrganisationInfo.name
-          },
-          {
-            headers: {
-              "Content-Type": "application/json"
-            }
-          }
-        );
-
-
-        const { data: User, error: ErrorUser } = await supabase
+        const { data: existingUser, error: existingUserError } = await supabase
           .from("profiles")
-          .insert({
-            org_id: OrganisationInfo.org_id,
-            auth_user_id: res.data?.user?.id,
-            email: formData.email,
-            first_name: formData.first_name,
-            last_name: formData.last_name,
-            phone: formData.phone,
-            role_id: formData.profile_type,
-            geographical_zones: formData.geographical_zones,
-            locale: formData.geographical_zones,
-            is_active: formData.is_active,
+          .select("*")
+          .eq("email", formData.email)
+          .single();
+
+        if (!existingUser) {
+          const res = await axios.post(
+            "https://supabase.iits.ma/functions/v1/create-user",
+            {
+              email: submittedData.email,
+              password: OrganisationInfo.name
+            },
+            {
+              headers: {
+                "Content-Type": "application/json"
+              }
+            }
+          );
+
+          const { data: User, error: ErrorUser } = await supabase
+            .from("profiles")
+            .insert({
+              org_id: OrganisationInfo.org_id,
+              auth_user_id: res.data?.user?.id,
+              email: submittedData.email,
+              first_name: submittedData.first_name,
+              last_name: submittedData.last_name,
+              phone: submittedData.phone,
+              role_id: submittedData.profile_type,
+              geographical_zones: [submittedData.geographical_zones] as GeographicalZoneType[],
+              locale: submittedData.locale,
+              is_active: submittedData.is_active,
+              hashed_pw: "test"
+            });
+        }
+        else {
+          const { data: User, error: ErrorUser } = await supabase
+          .from("profiles")
+          .update({
+            email: submittedData.email,
+            first_name: submittedData.first_name,
+            last_name: submittedData.last_name,
+            phone: submittedData.phone,
+            role_id: submittedData.profile_type,
+            geographical_zones: [submittedData.geographical_zones] as GeographicalZoneType[],
+            locale: submittedData.locale,
+            is_active: submittedData.is_active,
             hashed_pw: "test"
-          });
-          
+          })
+          .eq("user_id", existingUser.user_id);
+
+          console.log('Error User:', ErrorUser);
+        }
       }
     } catch (error) {
       console.error("Error fetching organisation info:", error);
+      if (error.response?.data) {
+        toast({
+          title: "Erreur technique",
+          description:
+            error.response.data?.error ||
+            "Une erreur est survenue lors de la création de l'utilisateur.",
+          variant: "destructive"
+        });
+      }
     }
 
     // console.log("Form submitted:", formData);
@@ -112,16 +145,20 @@ export const UserManagement = () => {
   };
 
   const handleEditUser = (user: Profile) => {
+    // console.log("Editing user:", user);
     setEditingUser(user);
     setFormData({
+      id: user.user_id,
       email: user.email,
       first_name: user.first_name || "",
       last_name: user.last_name || "",
       phone: user.phone || "",
-      profile_type: user.profile_type,
-      geographical_zones: user.geographical_zones,
-      is_active: user.is_active
+      profile_type: user.profile_type || user.role_id || "Default",
+      geographical_zones: user.geographical_zones[0] || "",
+      is_active: user.is_active,
+      locale: user.locale || ""
     });
+    // console.log("Form data:", formData);
     setIsDialogOpen(true);
   };
 
@@ -151,6 +188,8 @@ export const UserManagement = () => {
       </div>
     );
   }
+
+  // console.log("Submitted Form Data:", formData);
 
   return (
     <div className="space-y-6">
