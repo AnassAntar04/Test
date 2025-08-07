@@ -42,15 +42,34 @@ export const RoleManagement = () => {
     setRoles(data || []);
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchRoles();
-  },[])
 
-  console.log("RoleManagement: Rendering with userRoles:", ROLE_LABELS['administrateur']);
+    const channel = supabase
+      .channel("realtime-roles")
+      .on(
+        "postgres_changes",
+        {
+          event: "*", // INSERT, UPDATE, DELETE
+          schema: "public",
+          table: "roles"
+        },
+        (payload) => {
+          console.log("Change detected:", payload);
+          fetchRoles();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   // Compter les utilisateurs par rôle
   const getUserCountForRole = (role: string) => {
-    return userRoles.filter((ur) => ur.role_id === role && ur.is_active).length;
+    return userRoles.filter((ur) => ur.roles.role_id == role && ur.is_active)
+      .length;
   };
 
   const handleCreateRole = async () => {
@@ -67,14 +86,13 @@ export const RoleManagement = () => {
     try {
       // Note: En production, il faudrait modifier l'enum PostgreSQL
       // Pour l'instant, on simule la création en ajoutant à nos constantes locales
-      const {data : OrganisationInfo, error: ErrorOrganisationInfo} = await supabase.from("organisation").select("*").single();
-      const { data, error } = await supabase
-        .from("roles")
-        .insert({
-          name: newRoleName,
-          description: newRoleKey,
-          org_id: OrganisationInfo.org_id
-        });
+      const { data: OrganisationInfo, error: ErrorOrganisationInfo } =
+        await supabase.from("organisation").select("*").single();
+      const { data, error } = await supabase.from("roles").insert({
+        name: newRoleName,
+        description: newRoleKey,
+        org_id: OrganisationInfo.org_id
+      });
 
       setNewRoleName("");
       setNewRoleKey("");
@@ -90,7 +108,7 @@ export const RoleManagement = () => {
     }
   };
 
-  const handleDeleteRole = async (role: AppRole) => {
+  const handleDeleteRole = async (role: string) => {
     const userCount = getUserCountForRole(role);
 
     if (userCount > 0) {
@@ -104,12 +122,22 @@ export const RoleManagement = () => {
 
     try {
       // Note: Supprimer un rôle d'un enum PostgreSQL est complexe
+      const { error: ErrorDeletePermissions } = await supabase
+        .from("role_permissions")
+        .delete()
+        .eq("role_id", role);
+
+      const { error } = await supabase
+        .from("roles")
+        .delete()
+        .eq("role_id", role);
+
       toast({
-        title: "Limitation technique",
-        description:
-          "La suppression de rôles nécessite une modification de la base de données. Cette fonctionnalité sera bientôt disponible.",
+        title: "Succès",
+        description: "Le rôle a été supprimé avec succès " ,
         variant: "destructive"
       });
+
     } catch (error) {
       console.error("Error deleting role:", error);
       toast({
@@ -181,15 +209,18 @@ export const RoleManagement = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {Roles.map((role , level) => {
+            {Roles.map((role, level) => {
               const userCount = getUserCountForRole(role.role_id);
-              const canDelete =
-                userCount === 0 &&
-                !["super_admin", "administrateur" , "Owner" , "Supervisor"].includes(role);
+              const canDelete = ![
+                "super_admin",
+                "administrateur",
+                "Owner",
+                "Supervisor"
+              ].includes(role.name);
 
               return (
                 <div
-                  key={role}
+                  key={role.role_id}
                   className="flex items-center justify-between p-4 border rounded-lg"
                 >
                   <div className="flex items-center gap-3">
@@ -209,7 +240,12 @@ export const RoleManagement = () => {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    {["super_admin", "administrateur"].includes(role) && (
+                    {[
+                      "super_admin",
+                      "administrateur",
+                      "Supervisor",
+                      "Owner"
+                    ].includes(role.name) && (
                       <Badge variant="secondary" className="text-xs">
                         Système
                       </Badge>
@@ -233,15 +269,17 @@ export const RoleManagement = () => {
                             </AlertDialogTitle>
                             <AlertDialogDescription>
                               Êtes-vous sûr de vouloir supprimer le rôle "
-                              {ROLE_LABELS[role]}" ? Cette action est
-                              irréversible et supprimera également tous les
-                              privilèges associés.
+                              {role.name}" ? <br />
+                              Cette action est irréversible et supprimera
+                              également : <br />
+                              - tous les privilèges associés . <br />- tous les
+                              utilisateurs associés à ce rôle .
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Annuler</AlertDialogCancel>
                             <AlertDialogAction
-                              onClick={() => handleDeleteRole(role)}
+                              onClick={() => handleDeleteRole(role.role_id)}
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
                               Supprimer

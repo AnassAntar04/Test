@@ -171,7 +171,7 @@ export const UserForm = ({
                     Sélectionner un profil
                   </SelectItem>
                   {
-                  userRole.toLowerCase() === "Supervisor".toLowerCase() &&
+                  userRole.toLowerCase() === "Supervisor".toLowerCase() ?
                     Roles.filter(
                       (role) =>
                         ![ (editingUser && editingUser.roles?.name === "Supervisor") ? 
@@ -183,7 +183,13 @@ export const UserForm = ({
                       <SelectItem key={role.role_id} value={role.role_id}>
                         {role.name}
                       </SelectItem>
-                    ))}
+                    ))
+                    : Roles.map((role: any) => (
+                      <SelectItem key={role.role_id} value={role.role_id}>
+                        {role.name}
+                      </SelectItem>
+                    ))
+                  }
                 </SelectContent>
               </Select>
               {errors?.profile_type && (

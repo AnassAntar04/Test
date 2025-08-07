@@ -1,3 +1,706 @@
+// // import { useEffect, useState } from "react";
+// // import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+// // import { Button } from "@/components/ui/button";
+// // import { Badge } from "@/components/ui/badge";
+// // import { Switch } from "@/components/ui/switch";
+// // import { Textarea } from "@/components/ui/textarea";
+// // import { Input } from "@/components/ui/input";
+// // import { Label } from "@/components/ui/label";
+// // import {
+// //   Select,
+// //   SelectContent,
+// //   SelectItem,
+// //   SelectTrigger,
+// //   SelectValue
+// // } from "@/components/ui/select";
+// // import {
+// //   Dialog,
+// //   DialogContent,
+// //   DialogDescription,
+// //   DialogFooter,
+// //   DialogHeader,
+// //   DialogTitle,
+// //   DialogTrigger
+// // } from "@/components/ui/dialog";
+// // import {
+// //   AlertDialog,
+// //   AlertDialogAction,
+// //   AlertDialogCancel,
+// //   AlertDialogContent,
+// //   AlertDialogDescription,
+// //   AlertDialogFooter,
+// //   AlertDialogHeader,
+// //   AlertDialogTitle,
+// //   AlertDialogTrigger
+// // } from "@/components/ui/alert-dialog";
+// // import { Checkbox } from "@/components/ui/checkbox";
+// // import {
+// //   Zap,
+// //   Edit,
+// //   Plus,
+// //   Trash2,
+// //   Save,
+// //   Clock,
+// //   Mail,
+// //   MessageCircle,
+// //   Calendar
+// // } from "lucide-react";
+// // import { useToast } from "@/hooks/use-toast";
+// // import { supabase } from "@/integrations/supabase/client";
+
+// // export const AutoMessagesSettings = () => {
+// //   const { toast } = useToast();
+// //   const [isNewTemplateDialogOpen, setIsNewTemplateDialogOpen] = useState(false);
+// //   const [editingTemplate, setEditingTemplate] = useState<number | null>(null);
+
+// //   const [templates, setTemplates] = useState([]); // Placeholder for Supabase templates
+
+// //   // Form states
+// //   const [newTemplate, setNewTemplate] = useState({
+// //     trigger: "",
+// //     customTrigger: "",
+// //     time: "immediate",
+// //     customTime: "09:00",
+// //     message: "",
+// //     channels: [] as string[],
+// //     isActive: true
+// //   });
+
+// //   // const [templates, setTemplates] = useState([
+// //   //   {
+// //   //     id: 1,
+// //   //     trigger: "Confirmation réservation",
+// //   //     time: "Immédiat",
+// //   //     message:
+// //   //       "Bonjour [Traveller Name], Bienvenue ! Votre réservation à [Property Name] est confirmée pour le [Check-in Date]. Vous recevrez les instructions d'accès 24h avant votre arrivée. Code de réservation: [Booking Code]",
+// //   //     channels: ["Email", "WhatsApp"],
+// //   //     isActive: true
+// //   //   },
+// //   //   {
+// //   //     id: 2,
+// //   //     trigger: "J-1 avant arrivée",
+// //   //     time: "13h00",
+// //   //     message:
+// //   //       "Bonjour [Traveller Name], Votre séjour arrive à grands pas ! Voici vos codes d'accès pour demain: Code porte: [Door Code], WiFi: [WiFi Password]. Adresse exacte: [Property Address]. Bonne arrivée !",
+// //   //     channels: ["WhatsApp", "Email"],
+// //   //     isActive: true
+// //   //   },
+// //   //   {
+// //   //     id: 3,
+// //   //     trigger: "J-1 avant départ",
+// //   //     time: "14h00",
+// //   //     message:
+// //   //       "Bonjour [Traveller Name], Votre séjour se termine demain à [Check-out Time]. Merci de laisser les clés dans la boîte et de fermer toutes les fenêtres. Comment s'est passé votre séjour ?",
+// //   //     channels: ["WhatsApp", "Email"],
+// //   //     isActive: true
+// //   //   },
+// //   //   {
+// //   //     id: 4,
+// //   //     trigger: "Post check-out",
+// //   //     time: "13h00",
+// //   //     message:
+// //   //       "Nous vous remercions pour votre séjour à [Property Name] ! Votre avis nous intéresse : [Review Link]. À très bientôt pour un nouveau séjour !",
+// //   //     channels: ["Email", "WhatsApp"],
+// //   //     isActive: true
+// //   //   }
+// //   // ]);
+
+// //   const fetchTemplates = async () => {
+// //     try {
+// //       const { data, error } = await supabase
+// //         .from("auto_message_templates")
+// //         .select("*")
+// //         .order("created_at", { ascending: true }); // or false for descending
+
+// //       console.log("Fetched templates:", error);
+// //       setTemplates(data || []);
+// //       console.log("Templates fetched from Supabase:", data);
+// //     } catch (error) {
+// //       console.error("Error fetching templates:", error);
+// //       toast({
+// //         title: "Erreur",
+// //         description: "Impossible de charger les templates depuis Supabase.",
+// //         variant: "destructive"
+// //       });
+// //     }
+// //   };
+
+// //   const HandleEditTemplate = async (id: string, textarea: string) => {
+// //     // const template = templates.find((t) => t.id === id);
+// //     // if (!template) return;
+// //     const { data, error } = await supabase
+// //       .from("auto_message_templates")
+// //       .update({
+// //         message_template: textarea
+// //       })
+// //       .eq("auto_id", id);
+
+// //     setEditingTemplate(null);
+// //     fetchTemplates();
+
+// //     // console.log("Editing template:", editingTemplate);
+// //     // console.log("Editing template:", textarea);
+// //   };
+
+// //   useEffect(() => {
+// //     fetchTemplates();
+// //   }, []);
+
+// //   // console.log("Editing template:", editingTemplate);
+
+// //   const availableTriggers = [
+// //     "Confirmation réservation",
+// //     "J-7 avant arrivée",
+// //     "J-1 avant arrivée",
+// //     "Le jour d'arrivée",
+// //     "Pendant le séjour",
+// //     "J-1 avant départ",
+// //     "Post check-out",
+// //     "Feedback demande",
+// //     "Personnalisé"
+// //   ];
+
+// //   const availableChannels = [
+// //     { id: "email", label: "Email", icon: Mail },
+// //     { id: "whatsapp", label: "WhatsApp", icon: MessageCircle },
+// //     { id: "sms", label: "SMS", icon: MessageCircle }
+// //   ];
+
+// //   const availableVariables = [
+// //     "[Traveller Name]",
+// //     "[Property Name]",
+// //     "[Check-in Date]",
+// //     "[Check-out Date]",
+// //     "[Check-in Time]",
+// //     "[Check-out Time]",
+// //     "[Door Code]",
+// //     "[WiFi Password]",
+// //     "[Property Address]",
+// //     "[Booking Code]",
+// //     "[Phone Number]",
+// //     "[Review Link]",
+// //     "[Host Name]",
+// //     "[Emergency Contact]",
+// //     "[Total Amount]",
+// //     "[PIN Code]"
+// //   ];
+
+// //   const resetNewTemplate = () => {
+// //     setNewTemplate({
+// //       trigger: "",
+// //       customTrigger: "",
+// //       time: "immediate",
+// //       customTime: "09:00",
+// //       message: "",
+// //       channels: [],
+// //       isActive: true
+// //     });
+// //   };
+
+// //   const handleCreateTemplate = () => {
+// //     if (
+// //       !newTemplate.trigger ||
+// //       !newTemplate.message ||
+// //       newTemplate.channels.length === 0
+// //     ) {
+// //       toast({
+// //         title: "Erreur",
+// //         description: "Veuillez remplir tous les champs obligatoires.",
+// //         variant: "destructive"
+// //       });
+// //       return;
+// //     }
+
+// //     const finalTrigger =
+// //       newTemplate.trigger === "Personnalisé"
+// //         ? newTemplate.customTrigger
+// //         : newTemplate.trigger;
+// //     const finalTime =
+// //       newTemplate.time === "custom"
+// //         ? newTemplate.customTime
+// //         : newTemplate.time === "immediate"
+// //         ? "Immédiat"
+// //         : newTemplate.time;
+
+// //     const template = {
+// //       id: Date.now(),
+// //       trigger: finalTrigger,
+// //       time: finalTime,
+// //       message: newTemplate.message,
+// //       channels: newTemplate.channels,
+// //       isActive: newTemplate.isActive
+// //     };
+
+// //     setTemplates([...templates, template]);
+// //     resetNewTemplate();
+// //     setIsNewTemplateDialogOpen(false);
+
+// //     console.log("Creating template:", template);
+
+// //     toast({
+// //       title: "Template créé",
+// //       description: `Le template "${finalTrigger}" a été créé avec succès.`
+// //     });
+// //   };
+
+// //   const handleToggleTemplate = async (id: string) => {
+// //     // setTemplates(
+// //     //   templates.map((t) => (t.id === id ? { ...t, isActive: !t.isActive } : t))
+// //     // );
+
+// //     // const template = templates.find((t) => t.id === id);
+
+// //       const { data, error } = await supabase
+// //       .from("auto_message_templates")
+// //       .update({
+// //         is_active: templates.find((t) => t.auto_id === id)?.is_active ? false : true
+// //       })
+// //       .eq("auto_id", id);
+
+// //       fetchTemplates();
+// //       // .select("*")
+
+// //       // console.log("Toggling template:", data, error);
+// //     // toast({
+// //     //   title: "Template mis à jour",
+// //     //   description: `Le template "${template?.trigger}" a été ${
+// //     //     template?.isActive ? "désactivé" : "activé"
+// //     //   }.`
+// //     // });
+// //   };
+
+// //   const handleDeleteTemplate = async (id: string) => {
+
+// //     const { error } = await supabase
+// //       .from("auto_message_templates")
+// //       .delete()
+// //       .eq("auto_id", id);
+
+// //       fetchTemplates();
+
+// //     // const template = templates.find((t) => t.id === id);
+// //     // setTemplates(templates.filter((t) => t.id !== id));
+
+// //     // toast({
+// //     //   title: "Template supprimé",
+// //     //   description: `Le template "${template?.trigger}" a été supprimé.`
+// //     // });
+// //   };
+
+// //   const handleSaveTemplate = (id: number, updatedMessage: string) => {
+// //     setTemplates(
+// //       templates.map((t) =>
+// //         t.id === id ? { ...t, message: updatedMessage } : t
+// //       )
+// //     );
+
+// //     setEditingTemplate(null);
+// //     toast({
+// //       title: "Template sauvegardé",
+// //       description: "Les modifications ont été enregistrées."
+// //     });
+// //   };
+
+// //   const insertVariable = (variable: string) => {
+// //     setNewTemplate({
+// //       ...newTemplate,
+// //       message: newTemplate.message + variable
+// //     });
+// //   };
+
+// //   return (
+// //     <div className="space-y-6">
+// //       <div className="flex items-center justify-between">
+// //         <div>
+// //           <h3 className="text-xl font-semibold">Messages Automatiques</h3>
+// //           <p className="text-muted-foreground">
+// //             Configuration des workflows de messages par étape du parcours
+// //           </p>
+// //         </div>
+
+// //         <Dialog
+// //           open={isNewTemplateDialogOpen}
+// //           onOpenChange={setIsNewTemplateDialogOpen}
+// //         >
+// //           <DialogTrigger asChild>
+// //             <Button onClick={resetNewTemplate}>
+// //               <Plus className="mr-2 h-4 w-4" />
+// //               Nouveau Template
+// //             </Button>
+// //           </DialogTrigger>
+// //           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+// //             <DialogHeader>
+// //               <DialogTitle>Créer un nouveau template</DialogTitle>
+// //               <DialogDescription>
+// //                 Configurez un nouveau message automatique avec ses déclencheurs
+// //                 et canaux d'envoi.
+// //               </DialogDescription>
+// //             </DialogHeader>
+// //             <div className="space-y-6">
+// //               {/* Déclencheur */}
+// //               <div className="grid grid-cols-2 gap-4">
+// //                 <div className="space-y-2">
+// //                   <Label htmlFor="trigger">Déclencheur *</Label>
+// //                   <Select
+// //                     value={newTemplate.trigger}
+// //                     onValueChange={(value) =>
+// //                       setNewTemplate({ ...newTemplate, trigger: value })
+// //                     }
+// //                   >
+// //                     <SelectTrigger>
+// //                       <SelectValue placeholder="Sélectionner un déclencheur" />
+// //                     </SelectTrigger>
+// //                     <SelectContent>
+// //                       {availableTriggers.map((trigger) => (
+// //                         <SelectItem key={trigger} value={trigger}>
+// //                           {trigger}
+// //                         </SelectItem>
+// //                       ))}
+// //                     </SelectContent>
+// //                   </Select>
+// //                 </div>
+
+// //                 {newTemplate.trigger === "Personnalisé" && (
+// //                   <div className="space-y-2">
+// //                     <Label htmlFor="customTrigger">
+// //                       Déclencheur personnalisé *
+// //                     </Label>
+// //                     <Input
+// //                       id="customTrigger"
+// //                       placeholder="ex: J-3 avant arrivée"
+// //                       value={newTemplate.customTrigger}
+// //                       onChange={(e) =>
+// //                         setNewTemplate({
+// //                           ...newTemplate,
+// //                           customTrigger: e.target.value
+// //                         })
+// //                       }
+// //                     />
+// //                   </div>
+// //                 )}
+// //               </div>
+
+// //               {/* Horaire */}
+// //               <div className="grid grid-cols-2 gap-4">
+// //                 <div className="space-y-2">
+// //                   <Label htmlFor="time">Horaire d'envoi</Label>
+// //                   <Select
+// //                     value={newTemplate.time}
+// //                     onValueChange={(value) =>
+// //                       setNewTemplate({ ...newTemplate, time: value })
+// //                     }
+// //                   >
+// //                     <SelectTrigger>
+// //                       <SelectValue />
+// //                     </SelectTrigger>
+// //                     <SelectContent>
+// //                       <SelectItem value="immediate">Immédiat</SelectItem>
+// //                       <SelectItem value="09:00">09h00</SelectItem>
+// //                       <SelectItem value="13:00">13h00</SelectItem>
+// //                       <SelectItem value="18:00">18h00</SelectItem>
+// //                       <SelectItem value="custom">Personnalisé</SelectItem>
+// //                     </SelectContent>
+// //                   </Select>
+// //                 </div>
+
+// //                 {newTemplate.time === "custom" && (
+// //                   <div className="space-y-2">
+// //                     <Label htmlFor="customTime">Heure personnalisée</Label>
+// //                     <Input
+// //                       id="customTime"
+// //                       type="time"
+// //                       value={newTemplate.customTime}
+// //                       onChange={(e) =>
+// //                         setNewTemplate({
+// //                           ...newTemplate,
+// //                           customTime: e.target.value
+// //                         })
+// //                       }
+// //                     />
+// //                   </div>
+// //                 )}
+// //               </div>
+
+// //               {/* Canaux */}
+// //               <div className="space-y-2">
+// //                 <Label>Canaux d'envoi *</Label>
+// //                 <div className="grid grid-cols-3 gap-4">
+// //                   {availableChannels.map((channel) => (
+// //                     <div
+// //                       key={channel.id}
+// //                       className="flex items-center space-x-2"
+// //                     >
+// //                       <Checkbox
+// //                         id={channel.id}
+// //                         checked={newTemplate.channels.includes(channel.label)}
+// //                         onCheckedChange={(checked) => {
+// //                           if (checked) {
+// //                             setNewTemplate({
+// //                               ...newTemplate,
+// //                               channels: [...newTemplate.channels, channel.label]
+// //                             });
+// //                           } else {
+// //                             setNewTemplate({
+// //                               ...newTemplate,
+// //                               channels: newTemplate.channels.filter(
+// //                                 (c) => c !== channel.label
+// //                               )
+// //                             });
+// //                           }
+// //                         }}
+// //                       />
+// //                       <Label
+// //                         htmlFor={channel.id}
+// //                         className="flex items-center space-x-2 cursor-pointer"
+// //                       >
+// //                         <channel.icon className="h-4 w-4" />
+// //                         <span>{channel.label}</span>
+// //                       </Label>
+// //                     </div>
+// //                   ))}
+// //                 </div>
+// //               </div>
+
+// //               {/* Message */}
+// //               <div className="space-y-2">
+// //                 <Label htmlFor="message">Template de message *</Label>
+// //                 <Textarea
+// //                   id="message"
+// //                   placeholder="Tapez votre message ici..."
+// //                   value={newTemplate.message}
+// //                   onChange={(e) =>
+// //                     setNewTemplate({ ...newTemplate, message: e.target.value })
+// //                   }
+// //                   className="min-h-[120px]"
+// //                 />
+// //               </div>
+
+// //               {/* Variables */}
+// //               <div className="space-y-2">
+// //                 <Label>Variables disponibles</Label>
+// //                 <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 border rounded">
+// //                   {availableVariables.map((variable) => (
+// //                     <Button
+// //                       key={variable}
+// //                       variant="outline"
+// //                       size="sm"
+// //                       className="text-xs h-6"
+// //                       onClick={() => insertVariable(variable)}
+// //                     >
+// //                       {variable}
+// //                     </Button>
+// //                   ))}
+// //                 </div>
+// //               </div>
+// //             </div>
+// //             <DialogFooter>
+// //               <Button
+// //                 variant="outline"
+// //                 onClick={() => setIsNewTemplateDialogOpen(false)}
+// //               >
+// //                 Annuler
+// //               </Button>
+// //               <Button onClick={handleCreateTemplate}>Créer le template</Button>
+// //             </DialogFooter>
+// //           </DialogContent>
+// //         </Dialog>
+// //       </div>
+
+// //       {/* Templates existants */}
+// //       <div className="space-y-4">
+// //         {templates.map((template) => (
+// //           <Card key={template.id}>
+// //             <CardHeader>
+// //               <CardTitle className="flex items-center justify-between">
+// //                 <div className="flex items-center space-x-2">
+// //                   <Zap className="h-5 w-5 text-warning" />
+// //                   <span>{template.name}</span>
+// //                   <Badge
+// //                     variant="secondary"
+// //                     className="flex items-center gap-1"
+// //                   >
+// //                     <Clock className="h-3 w-3" />
+// //                     {template.custom_time}
+// //                   </Badge>
+// //                   {!template.is_active && (
+// //                     <Badge variant="destructive">Inactif</Badge>
+// //                   )}
+// //                 </div>
+// //                 <div className="flex items-center space-x-2">
+// //                   <Switch
+// //                     checked={template.is_active}
+// //                     onCheckedChange={() =>
+// //                       handleToggleTemplate(template.auto_id)
+// //                     }
+// //                   />
+// //                   <Button
+// //                     variant="outline"
+// //                     size="sm"
+// //                     onClick={() =>
+// //                       setEditingTemplate(
+// //                         editingTemplate === template.id ? null : template.id
+// //                       )
+// //                     }
+// //                   >
+// //                     <Edit className="h-4 w-4" />
+// //                   </Button>
+// //                   <AlertDialog>
+// //                     <AlertDialogTrigger asChild>
+// //                       <Button
+// //                         variant="outline"
+// //                         size="sm"
+// //                         className="text-destructive hover:text-destructive"
+// //                       >
+// //                         <Trash2 className="h-4 w-4" />
+// //                       </Button>
+// //                     </AlertDialogTrigger>
+// //                     <AlertDialogContent>
+// //                       <AlertDialogHeader>
+// //                         <AlertDialogTitle>
+// //                           Supprimer le template
+// //                         </AlertDialogTitle>
+// //                         <AlertDialogDescription>
+// //                           Êtes-vous sûr de vouloir supprimer le template "
+// //                           {template.name}" ? Cette action est irréversible.
+// //                         </AlertDialogDescription>
+// //                       </AlertDialogHeader>
+// //                       <AlertDialogFooter>
+// //                         <AlertDialogCancel>Annuler</AlertDialogCancel>
+// //                         <AlertDialogAction
+// //                           onClick={() => handleDeleteTemplate(template.auto_id)}
+// //                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+// //                         >
+// //                           Supprimer
+// //                         </AlertDialogAction>
+// //                       </AlertDialogFooter>
+// //                     </AlertDialogContent>
+// //                   </AlertDialog>
+// //                 </div>
+// //               </CardTitle>
+// //             </CardHeader>
+// //             <CardContent className="space-y-4">
+// //               <div className="space-y-2">
+// //                 <Label>Template de message</Label>
+// //                 {editingTemplate === template.id ? (
+// //                   <div className="space-y-2">
+// //                     <Textarea
+// //                       defaultValue={template.message_template}
+// //                       className="min-h-[100px]"
+// //                       id={`message-${template.id}`}
+// //                     />
+// //                     <div className="flex justify-end space-x-2">
+// //                       <Button
+// //                         variant="outline"
+// //                         size="sm"
+// //                         onClick={() => setEditingTemplate(null)}
+// //                       >
+// //                         Annuler
+// //                       </Button>
+// //                       <Button
+// //                         size="sm"
+// //                         onClick={() => {
+// //                           const textarea = document.getElementById(
+// //                             `message-${template.id}`
+// //                           ) as HTMLTextAreaElement;
+// //                           HandleEditTemplate(template.auto_id, textarea.value);
+// //                         }}
+// //                       >
+// //                         <Save className="h-4 w-4 mr-2" />
+// //                         Sauvegarder
+// //                       </Button>
+// //                     </div>
+// //                   </div>
+// //                 ) : (
+// //                   <div className="p-3 bg-muted rounded text-sm">
+// //                     {template.message_template}
+// //                   </div>
+// //                 )}
+// //               </div>
+
+// //               <div className="flex items-center justify-between">
+// //                 <div className="space-y-2">
+// //                   <Label>Canaux d'envoi</Label>
+// //                   <div className="flex space-x-2">
+// //                     {template.channels.map((channel) => (
+// //                       <Badge
+// //                         key={channel}
+// //                         variant="outline"
+// //                         className="flex items-center gap-1"
+// //                       >
+// //                         {channel === "Email" && <Mail className="h-3 w-3" />}
+// //                         {channel === "WhatsApp" && (
+// //                           <MessageCircle className="h-3 w-3" />
+// //                         )}
+// //                         {channel === "SMS" && (
+// //                           <MessageCircle className="h-3 w-3" />
+// //                         )}
+// //                         {channel}
+// //                       </Badge>
+// //                     ))}
+// //                   </div>
+// //                 </div>
+
+// //                 <div className="space-y-2">
+// //                   <Label>Variables détectées</Label>
+// //                   <div className="flex flex-wrap gap-1 text-xs max-w-md">
+// //                     {template.variables.map((variable) => (
+// //                       <Badge
+// //                         key={variable}
+// //                         variant="secondary"
+// //                         className="text-xs"
+// //                       >
+// //                         {variable}
+// //                       </Badge>
+// //                     ))}
+// //                   </div>
+// //                 </div>
+// //               </div>
+// //             </CardContent>
+// //           </Card>
+// //         ))}
+// //       </div>
+
+// //       {/* Statistiques */}
+// //       <Card>
+// //         <CardHeader>
+// //           <CardTitle className="flex items-center gap-2">
+// //             <Calendar className="h-5 w-5" />
+// //             Statistiques des envois
+// //           </CardTitle>
+// //         </CardHeader>
+// //         <CardContent>
+// //           <div className="grid grid-cols-4 gap-4 text-center">
+// //             <div className="space-y-1">
+// //               <div className="text-2xl font-bold text-primary">1,247</div>
+// //               <div className="text-sm text-muted-foreground">
+// //                 Messages envoyés ce mois
+// //               </div>
+// //             </div>
+// //             <div className="space-y-1">
+// //               <div className="text-2xl font-bold text-green-600">94.2%</div>
+// //               <div className="text-sm text-muted-foreground">
+// //                 Taux de délivrance
+// //               </div>
+// //             </div>
+// //             <div className="space-y-1">
+// //               <div className="text-2xl font-bold text-blue-600">67.8%</div>
+// //               <div className="text-sm text-muted-foreground">
+// //                 Taux d'ouverture
+// //               </div>
+// //             </div>
+// //             <div className="space-y-1">
+// //               <div className="text-2xl font-bold text-orange-600">12.4%</div>
+// //               <div className="text-sm text-muted-foreground">
+// //                 Taux de réponse
+// //               </div>
+// //             </div>
+// //           </div>
+// //         </CardContent>
+// //       </Card>
+// //     </div>
+// //   );
+// // };
+
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -51,102 +754,21 @@ import { supabase } from "@/integrations/supabase/client";
 export const AutoMessagesSettings = () => {
   const { toast } = useToast();
   const [isNewTemplateDialogOpen, setIsNewTemplateDialogOpen] = useState(false);
-  const [editingTemplate, setEditingTemplate] = useState<number | null>(null);
-
-  const [templates, setTemplates] = useState([]); // Placeholder for Supabase templates
+  const [editingTemplate, setEditingTemplate] = useState(null);
+  const [templates, setTemplates] = useState([]);
+  const [editingMessage, setEditingMessage] = useState("");
 
   // Form states
   const [newTemplate, setNewTemplate] = useState({
-    trigger: "",
+    name: "",
+    triggerType: "",
     customTrigger: "",
-    time: "immediate",
+    scheduleTime: "immediate",
     customTime: "09:00",
     message: "",
-    channels: [] as string[],
+    channels: [],
     isActive: true
   });
-
-  // const [templates, setTemplates] = useState([
-  //   {
-  //     id: 1,
-  //     trigger: "Confirmation réservation",
-  //     time: "Immédiat",
-  //     message:
-  //       "Bonjour [Traveller Name], Bienvenue ! Votre réservation à [Property Name] est confirmée pour le [Check-in Date]. Vous recevrez les instructions d'accès 24h avant votre arrivée. Code de réservation: [Booking Code]",
-  //     channels: ["Email", "WhatsApp"],
-  //     isActive: true
-  //   },
-  //   {
-  //     id: 2,
-  //     trigger: "J-1 avant arrivée",
-  //     time: "13h00",
-  //     message:
-  //       "Bonjour [Traveller Name], Votre séjour arrive à grands pas ! Voici vos codes d'accès pour demain: Code porte: [Door Code], WiFi: [WiFi Password]. Adresse exacte: [Property Address]. Bonne arrivée !",
-  //     channels: ["WhatsApp", "Email"],
-  //     isActive: true
-  //   },
-  //   {
-  //     id: 3,
-  //     trigger: "J-1 avant départ",
-  //     time: "14h00",
-  //     message:
-  //       "Bonjour [Traveller Name], Votre séjour se termine demain à [Check-out Time]. Merci de laisser les clés dans la boîte et de fermer toutes les fenêtres. Comment s'est passé votre séjour ?",
-  //     channels: ["WhatsApp", "Email"],
-  //     isActive: true
-  //   },
-  //   {
-  //     id: 4,
-  //     trigger: "Post check-out",
-  //     time: "13h00",
-  //     message:
-  //       "Nous vous remercions pour votre séjour à [Property Name] ! Votre avis nous intéresse : [Review Link]. À très bientôt pour un nouveau séjour !",
-  //     channels: ["Email", "WhatsApp"],
-  //     isActive: true
-  //   }
-  // ]);
-
-  const fetchTemplates = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("auto_message_templates")
-        .select("*")
-        .order("created_at", { ascending: true }); // or false for descending
-
-      console.log("Fetched templates:", error);
-      setTemplates(data || []);
-      console.log("Templates fetched from Supabase:", data);
-    } catch (error) {
-      console.error("Error fetching templates:", error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les templates depuis Supabase.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const HandleEditTemplate = async (id: string, textarea: string) => {
-    // const template = templates.find((t) => t.id === id);
-    // if (!template) return;
-    const { data, error } = await supabase
-      .from("auto_message_templates")
-      .update({
-        message_template: textarea
-      })
-      .eq("auto_id", id);
-
-    setEditingTemplate(null);
-    fetchTemplates();
-
-    // console.log("Editing template:", editingTemplate);
-    // console.log("Editing template:", textarea);
-  };
-
-  useEffect(() => {
-    fetchTemplates();
-  }, []);
-
-  // console.log("Editing template:", editingTemplate);
 
   const availableTriggers = [
     "Confirmation réservation",
@@ -167,39 +789,72 @@ export const AutoMessagesSettings = () => {
   ];
 
   const availableVariables = [
-    "[Traveller Name]",
-    "[Property Name]",
-    "[Check-in Date]",
-    "[Check-out Date]",
-    "[Check-in Time]",
-    "[Check-out Time]",
-    "[Door Code]",
-    "[WiFi Password]",
-    "[Property Address]",
-    "[Booking Code]",
-    "[Phone Number]",
-    "[Review Link]",
-    "[Host Name]",
-    "[Emergency Contact]",
-    "[Total Amount]",
-    "[PIN Code]"
+    "[first name]",
+    "[last name]",
+    "[traveller name]",
+    "[property name]",
+    "[check-in date]",
+    "[check-out date]",
+    "[check-in time]",
+    "[check-out time]",
+    "[door code]",
+    "[wifi password]",
+    "[property address]",
+    "[booking code]",
+    "[phone number]",
+    "[review link]",
+    "[host name]",
+    "[emergency contact]",
+    "[total amount]",
+    "[pin code]"
   ];
 
-  const resetNewTemplate = () => {
-    setNewTemplate({
-      trigger: "",
-      customTrigger: "",
-      time: "immediate",
-      customTime: "09:00",
-      message: "",
-      channels: [],
-      isActive: true
+  // Function to detect only valid variables from the available list
+  const detectValidVariables = (text) => {
+    const foundVariables = [];
+
+    availableVariables.forEach((variable) => {
+      if (text.includes(variable)) {
+        foundVariables.push(variable);
+      }
     });
+
+    return [...new Set(foundVariables)]; // Remove duplicates
   };
 
-  const handleCreateTemplate = () => {
+  const fetchTemplates = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("auto_message_templates")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching templates:", error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de charger les templates depuis Supabase.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setTemplates(data || []);
+      console.log("Templates fetched from Supabase:", data);
+    } catch (error) {
+      console.error("Error fetching templates:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les templates depuis Supabase.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleCreateTemplate = async () => {
     if (
-      !newTemplate.trigger ||
+      !newTemplate.name ||
+      !newTemplate.triggerType ||
       !newTemplate.message ||
       newTemplate.channels.length === 0
     ) {
@@ -211,100 +866,226 @@ export const AutoMessagesSettings = () => {
       return;
     }
 
-    const finalTrigger =
-      newTemplate.trigger === "Personnalisé"
-        ? newTemplate.customTrigger
-        : newTemplate.trigger;
-    const finalTime =
-      newTemplate.time === "custom"
-        ? newTemplate.customTime
-        : newTemplate.time === "immediate"
-        ? "Immédiat"
-        : newTemplate.time;
-
-    const template = {
-      id: Date.now(),
-      trigger: finalTrigger,
-      time: finalTime,
-      message: newTemplate.message,
-      channels: newTemplate.channels,
-      isActive: newTemplate.isActive
-    };
-
-    setTemplates([...templates, template]);
-    resetNewTemplate();
-    setIsNewTemplateDialogOpen(false);
-
-    toast({
-      title: "Template créé",
-      description: `Le template "${finalTrigger}" a été créé avec succès.`
-    });
-  };
-
-  const handleToggleTemplate = async (id: string) => {
-    // setTemplates(
-    //   templates.map((t) => (t.id === id ? { ...t, isActive: !t.isActive } : t))
-    // );
-
-    // const template = templates.find((t) => t.id === id);
-
+    try {
       const { data, error } = await supabase
-      .from("auto_message_templates")
-      .update({
-        is_active: templates.find((t) => t.auto_id === id)?.is_active ? false : true 
-      })
-      .eq("auto_id", id);
+        .from("organisation")
+        .select("org_id")
+        .single();
 
+      const finalTrigger =
+        newTemplate.triggerType === "Personnalisé"
+          ? newTemplate.customTrigger
+          : newTemplate.triggerType;
+
+      const finalScheduleTime =
+        newTemplate.scheduleTime === "custom"
+          ? "scheduled"
+          : newTemplate.scheduleTime === "immediate"
+          ? "immediate"
+          : newTemplate.scheduleTime;
+
+      const finalCustomTime =
+        newTemplate.scheduleTime === "custom" ? newTemplate.customTime : null;
+
+      // Detect only valid variables in the message
+      const detectedVariables = detectValidVariables(newTemplate.message);
+
+      const templateData = {
+        org_id: data.org_id,
+        name: newTemplate.name,
+        trigger_type: finalTrigger,
+        custom_trigger:
+          newTemplate.triggerType === "Personnalisé"
+            ? newTemplate.customTrigger
+            : null,
+        schedule_time: finalScheduleTime,
+        custom_time: finalCustomTime,
+        message_template: newTemplate.message,
+        channels: newTemplate.channels,
+        variables: detectedVariables,
+        is_active: newTemplate.isActive
+      };
+
+      const { data: createdTemplate, error: createdTemplateError } =
+        await supabase
+          .from("auto_message_templates")
+          .insert([templateData])
+          .select();
+
+      if (error) {
+        console.error("Error creating template:", error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de créer le template.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      resetNewTemplate();
+      setIsNewTemplateDialogOpen(false);
       fetchTemplates();
-      // .select("*")
 
-      // console.log("Toggling template:", data, error);
-    // toast({
-    //   title: "Template mis à jour",
-    //   description: `Le template "${template?.trigger}" a été ${
-    //     template?.isActive ? "désactivé" : "activé"
-    //   }.`
-    // });
+      toast({
+        title: "Template créé",
+        description: `Le template "${newTemplate.name}" a été créé avec succès.`
+      });
+    } catch (error) {
+      console.error("Error creating template:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer le template.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleDeleteTemplate = async (id: string) => {
+  const handleEditTemplate = async (id, updatedMessage) => {
+    try {
+      // Detect only valid variables in the updated message
+      const detectedVariables = detectValidVariables(updatedMessage);
 
-    const { error } = await supabase
-      .from("auto_message_templates")
-      .delete()
-      .eq("auto_id", id);
+      const { error } = await supabase
+        .from("auto_message_templates")
+        .update({
+          message_template: updatedMessage,
+          variables: detectedVariables,
+          updated_at: new Date().toISOString()
+        })
+        .eq("auto_id", id);
+
+      if (error) {
+        console.error("Error updating template:", error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de mettre à jour le template.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setEditingTemplate(null);
+      setEditingMessage("");
+      fetchTemplates();
+
+      toast({
+        title: "Template sauvegardé",
+        description: "Les modifications ont été enregistrées."
+      });
+    } catch (error) {
+      console.error("Error updating template:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour le template.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleToggleTemplate = async (id) => {
+    try {
+      const template = templates.find((t) => t.auto_id === id);
+      if (!template) return;
+
+      const { error } = await supabase
+        .from("auto_message_templates")
+        .update({
+          is_active: !template.is_active,
+          updated_at: new Date().toISOString()
+        })
+        .eq("auto_id", id);
+
+      if (error) {
+        console.error("Error toggling template:", error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de modifier le statut du template.",
+          variant: "destructive"
+        });
+        return;
+      }
 
       fetchTemplates();
 
-    // const template = templates.find((t) => t.id === id);
-    // setTemplates(templates.filter((t) => t.id !== id));
-
-    // toast({
-    //   title: "Template supprimé",
-    //   description: `Le template "${template?.trigger}" a été supprimé.`
-    // });
+      toast({
+        title: "Template mis à jour",
+        description: `Le template "${template.name}" a été ${
+          template.is_active ? "désactivé" : "activé"
+        }.`
+      });
+    } catch (error) {
+      console.error("Error toggling template:", error);
+    }
   };
 
-  const handleSaveTemplate = (id: number, updatedMessage: string) => {
-    setTemplates(
-      templates.map((t) =>
-        t.id === id ? { ...t, message: updatedMessage } : t
-      )
-    );
+  const handleDeleteTemplate = async (id) => {
+    try {
+      const template = templates.find((t) => t.auto_id === id);
 
-    setEditingTemplate(null);
-    toast({
-      title: "Template sauvegardé",
-      description: "Les modifications ont été enregistrées."
+      const { error } = await supabase
+        .from("auto_message_templates")
+        .delete()
+        .eq("auto_id", id);
+
+      if (error) {
+        console.error("Error deleting template:", error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de supprimer le template.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      fetchTemplates();
+
+      toast({
+        title: "Template supprimé",
+        description: `Le template "${template?.name}" a été supprimé.`
+      });
+    } catch (error) {
+      console.error("Error deleting template:", error);
+    }
+  };
+
+  const resetNewTemplate = () => {
+    setNewTemplate({
+      name: "",
+      triggerType: "",
+      customTrigger: "",
+      scheduleTime: "immediate",
+      customTime: "09:00",
+      message: "",
+      channels: [],
+      isActive: true
     });
   };
 
-  const insertVariable = (variable: string) => {
+  const insertVariable = (variable) => {
     setNewTemplate({
       ...newTemplate,
       message: newTemplate.message + variable
     });
   };
+
+  const insertVariableInEdit = (variable) => {
+    setEditingMessage(editingMessage + variable);
+  };
+
+  const formatDisplayTime = (template) => {
+    if (template.schedule_time === "immediate") {
+      return "Immédiat";
+    } else if (template.custom_time) {
+      return template.custom_time.slice(0, 5); // Format HH:MM
+    } else if (template.schedule_time) {
+      return template.schedule_time.replace(":", "h");
+    }
+    return "Non défini";
+  };
+
+  useEffect(() => {
+    fetchTemplates();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -335,14 +1116,27 @@ export const AutoMessagesSettings = () => {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-6">
+              {/* Nom du template */}
+              <div className="space-y-2">
+                <Label htmlFor="name">Nom du template *</Label>
+                <Input
+                  id="name"
+                  placeholder="ex: Message de bienvenue"
+                  value={newTemplate.name}
+                  onChange={(e) =>
+                    setNewTemplate({ ...newTemplate, name: e.target.value })
+                  }
+                />
+              </div>
+
               {/* Déclencheur */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="trigger">Déclencheur *</Label>
                   <Select
-                    value={newTemplate.trigger}
+                    value={newTemplate.triggerType}
                     onValueChange={(value) =>
-                      setNewTemplate({ ...newTemplate, trigger: value })
+                      setNewTemplate({ ...newTemplate, triggerType: value })
                     }
                   >
                     <SelectTrigger>
@@ -358,7 +1152,7 @@ export const AutoMessagesSettings = () => {
                   </Select>
                 </div>
 
-                {newTemplate.trigger === "Personnalisé" && (
+                {newTemplate.triggerType === "Personnalisé" && (
                   <div className="space-y-2">
                     <Label htmlFor="customTrigger">
                       Déclencheur personnalisé *
@@ -383,9 +1177,9 @@ export const AutoMessagesSettings = () => {
                 <div className="space-y-2">
                   <Label htmlFor="time">Horaire d'envoi</Label>
                   <Select
-                    value={newTemplate.time}
+                    value={newTemplate.scheduleTime}
                     onValueChange={(value) =>
-                      setNewTemplate({ ...newTemplate, time: value })
+                      setNewTemplate({ ...newTemplate, scheduleTime: value })
                     }
                   >
                     <SelectTrigger>
@@ -401,7 +1195,7 @@ export const AutoMessagesSettings = () => {
                   </Select>
                 </div>
 
-                {newTemplate.time === "custom" && (
+                {newTemplate.scheduleTime === "custom" && (
                   <div className="space-y-2">
                     <Label htmlFor="customTime">Heure personnalisée</Label>
                     <Input
@@ -464,25 +1258,45 @@ export const AutoMessagesSettings = () => {
                 <Label htmlFor="message">Template de message *</Label>
                 <Textarea
                   id="message"
-                  placeholder="Tapez votre message ici..."
+                  placeholder="Tapez votre message ici et utilisez les variables disponibles ci-dessus..."
                   value={newTemplate.message}
                   onChange={(e) =>
                     setNewTemplate({ ...newTemplate, message: e.target.value })
                   }
                   className="min-h-[120px]"
                 />
+                {newTemplate.message && (
+                  <div className="mt-2">
+                    <Label className="text-sm text-muted-foreground">
+                      Variables détectées:
+                    </Label>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {detectValidVariables(newTemplate.message).map(
+                        (variable) => (
+                          <Badge
+                            key={variable}
+                            variant="secondary"
+                            className="text-xs"
+                          >
+                            {variable}
+                          </Badge>
+                        )
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Variables */}
+              {/* Variables disponibles */}
               <div className="space-y-2">
-                <Label>Variables disponibles</Label>
-                <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 border rounded">
+                <Label>Variables disponibles (cliquez pour insérer)</Label>
+                <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-3 border rounded bg-muted/30">
                   {availableVariables.map((variable) => (
                     <Button
                       key={variable}
                       variant="outline"
                       size="sm"
-                      className="text-xs h-6"
+                      className="text-xs h-7 hover:bg-primary hover:text-primary-foreground"
                       onClick={() => insertVariable(variable)}
                     >
                       {variable}
@@ -507,7 +1321,7 @@ export const AutoMessagesSettings = () => {
       {/* Templates existants */}
       <div className="space-y-4">
         {templates.map((template) => (
-          <Card key={template.id}>
+          <Card key={template.auto_id}>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
@@ -518,7 +1332,7 @@ export const AutoMessagesSettings = () => {
                     className="flex items-center gap-1"
                   >
                     <Clock className="h-3 w-3" />
-                    {template.custom_time}
+                    {formatDisplayTime(template)}
                   </Badge>
                   {!template.is_active && (
                     <Badge variant="destructive">Inactif</Badge>
@@ -534,11 +1348,15 @@ export const AutoMessagesSettings = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() =>
-                      setEditingTemplate(
-                        editingTemplate === template.id ? null : template.id
-                      )
-                    }
+                    onClick={() => {
+                      if (editingTemplate === template.auto_id) {
+                        setEditingTemplate(null);
+                        setEditingMessage("");
+                      } else {
+                        setEditingTemplate(template.auto_id);
+                        setEditingMessage(template.message_template);
+                      }
+                    }}
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
@@ -579,28 +1397,70 @@ export const AutoMessagesSettings = () => {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>Template de message</Label>
-                {editingTemplate === template.id ? (
-                  <div className="space-y-2">
+                {editingTemplate === template.auto_id ? (
+                  <div className="space-y-3">
+                    {/* Variables disponibles pour l'édition */}
+                    <div className="space-y-2">
+                      <Label className="text-sm">
+                        Variables disponibles (cliquez pour insérer)
+                      </Label>
+                      <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto p-2 border rounded bg-muted/30">
+                        {availableVariables.map((variable) => (
+                          <Button
+                            key={variable}
+                            variant="outline"
+                            size="sm"
+                            className="text-xs h-6 hover:bg-primary hover:text-primary-foreground"
+                            onClick={() => insertVariableInEdit(variable)}
+                          >
+                            {variable}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+
                     <Textarea
-                      defaultValue={template.message_template}
+                      value={editingMessage}
+                      onChange={(e) => setEditingMessage(e.target.value)}
                       className="min-h-[100px]"
-                      id={`message-${template.id}`}
                     />
+
+                    {editingMessage && (
+                      <div className="mt-2">
+                        <Label className="text-sm text-muted-foreground">
+                          Variables détectées:
+                        </Label>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {detectValidVariables(editingMessage).map(
+                            (variable) => (
+                              <Badge
+                                key={variable}
+                                variant="secondary"
+                                className="text-xs"
+                              >
+                                {variable}
+                              </Badge>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    )}
+
                     <div className="flex justify-end space-x-2">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setEditingTemplate(null)}
+                        onClick={() => {
+                          setEditingTemplate(null);
+                          setEditingMessage("");
+                        }}
                       >
                         Annuler
                       </Button>
                       <Button
                         size="sm"
                         onClick={() => {
-                          const textarea = document.getElementById(
-                            `message-${template.id}`
-                          ) as HTMLTextAreaElement;
-                          HandleEditTemplate(template.auto_id, textarea.value);
+                          handleEditTemplate(template.auto_id, editingMessage);
                         }}
                       >
                         <Save className="h-4 w-4 mr-2" />
@@ -619,7 +1479,7 @@ export const AutoMessagesSettings = () => {
                 <div className="space-y-2">
                   <Label>Canaux d'envoi</Label>
                   <div className="flex space-x-2">
-                    {template.channels.map((channel) => (
+                    {template.channels?.map((channel) => (
                       <Badge
                         key={channel}
                         variant="outline"
@@ -641,7 +1501,7 @@ export const AutoMessagesSettings = () => {
                 <div className="space-y-2">
                   <Label>Variables détectées</Label>
                   <div className="flex flex-wrap gap-1 text-xs max-w-md">
-                    {template.variables.map((variable) => (
+                    {template.variables?.map((variable) => (
                       <Badge
                         key={variable}
                         variant="secondary"
@@ -653,10 +1513,34 @@ export const AutoMessagesSettings = () => {
                   </div>
                 </div>
               </div>
+
+              <div className="text-sm text-muted-foreground">
+                <div>Déclencheur: {template.trigger_type}</div>
+                {template.custom_trigger && (
+                  <div>Déclencheur personnalisé: {template.custom_trigger}</div>
+                )}
+              </div>
             </CardContent>
           </Card>
         ))}
       </div>
+
+      {templates.length === 0 && (
+        <Card>
+          <CardContent className="text-center py-8">
+            <div className="text-muted-foreground">
+              Aucun template créé pour le moment.
+            </div>
+            <Button
+              className="mt-4"
+              onClick={() => setIsNewTemplateDialogOpen(true)}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Créer votre premier template
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Statistiques */}
       <Card>

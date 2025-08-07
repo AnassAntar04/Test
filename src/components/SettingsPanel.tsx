@@ -9,7 +9,9 @@ import {
   Bell, 
   Shield, 
   AlertTriangle,
-  UserCog
+  UserCog,
+  Group,
+  GroupIcon
 } from "lucide-react";
 import { UserManagement } from "@/components/UserManagement";
 import { ChatbotsSettings } from "@/components/settings/ChatbotsSettings";
@@ -20,6 +22,8 @@ import { NotificationsSettings } from "@/components/settings/NotificationsSettin
 import { GeneralSettings } from "@/components/settings/GeneralSettings";
 import { RolePrivilegesManagement } from "@/components/role-management/RolePrivilegesManagement";
 import { RoleManagement } from "@/components/role-management/RoleManagement";
+import { PanelGroup } from "react-resizable-panels";
+import { GroupeMessagesSettings } from "./settings/GroupeMessagesSettings";
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -60,6 +64,10 @@ export const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
                 <MessageSquare className="mr-2 h-4 w-4" />
                 Messages Auto
               </TabsTrigger>
+              <TabsTrigger value="GroupeMessages" className="w-full justify-start mb-1">
+                <Group className="mr-2 h-4 w-4" />
+                Groupe Messages
+              </TabsTrigger>
               <TabsTrigger value="escalation" className="w-full justify-start mb-1">
                 <AlertTriangle className="mr-2 h-4 w-4" />
                 Escalade & Routage
@@ -97,6 +105,9 @@ export const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
                 </TabsContent>
                 <TabsContent value="messages" className="space-y-6 m-0">
                   <AutoMessagesSettings />
+                </TabsContent>
+                <TabsContent value="GroupeMessages" className="space-y-6 m-0">
+                  <GroupeMessagesSettings />
                 </TabsContent>
                 <TabsContent value="escalation" className="space-y-6 m-0">
                   <EscalationSettings />
