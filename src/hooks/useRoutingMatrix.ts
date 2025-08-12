@@ -5,36 +5,38 @@ import { requestTypesService } from "@/services/requestTypesService";
 import { routingMatrixService } from "@/services/routingMatrixService";
 import { escalationRulesService } from "@/services/escalationRulesService";
 import { getPermissionIcon, getPermissionForRole } from "@/utils/routingUtils";
+import { supabase } from "@/integrations/supabase/client";
 
 // Re-export types for compatibility
 export type { RequestType, RoutingMatrix, EscalationRule };
 
 export const useRoutingMatrix = () => {
-  const [requestTypes, setRequestTypes] = useState<RequestType[]>([]);
-  const [routingMatrix, setRoutingMatrix] = useState<RoutingMatrix[]>([]);
-  const [escalationRules, setEscalationRules] = useState<EscalationRule[]>([]);
+  const [requestTypes, setRequestTypes] = useState([]);
+  const [routingMatrix, setRoutingMatrix] = useState([]);
+  const [escalationRules, setEscalationRules] = useState([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      
-      const [requestTypesData, routingMatrixData, escalationRulesData] = await Promise.all([
-        requestTypesService.fetchAll(),
-        routingMatrixService.fetchAll(),
-        escalationRulesService.fetchAll()
-      ]);
+
+      const [requestTypesData, routingMatrixData, escalationRulesData] =
+        await Promise.all([
+          requestTypesService.fetchAll(),
+          routingMatrixService.fetchAll(),
+          escalationRulesService.fetchAll()
+        ]);
 
       setRequestTypes(requestTypesData);
       setRoutingMatrix(routingMatrixData);
       setEscalationRules(escalationRulesData);
     } catch (error) {
-      console.error('Error fetching routing data:', error);
+      console.error("Error fetching routing data:", error);
       toast({
         title: "Erreur",
         description: "Impossible de charger les données de routage",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
@@ -43,65 +45,129 @@ export const useRoutingMatrix = () => {
 
   useEffect(() => {
     fetchData();
+
+    // Subscriptions
+    const requestTypesChannel = supabase
+      .channel("realtime-category")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "category" },
+        () => fetchData()
+      )
+      .subscribe();
+
+    const routingMatrixChannel = supabase
+      .channel("realtime-escalation-categories")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "escalation_categories" },
+        () => fetchData()
+      )
+      .subscribe();
+
+    const escalationRulesChannel = supabase
+      .channel("realtime-escalation-rules")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "escalation_rules" },
+        () => fetchData()
+      )
+      .subscribe();
+
+    return () => {
+      // Cleanup
+      supabase.removeChannel(requestTypesChannel);
+      supabase.removeChannel(routingMatrixChannel);
+      supabase.removeChannel(escalationRulesChannel);
+    };
   }, []);
 
-  const updateRoutingMatrix = async (requestTypeId: string, role: string, permissionType: RoutingMatrix['permission_type']) => {
+  const updateRoutingMatrix = async (
+    requestTypeId: string,
+    role: string,
+    permissionType: RoutingMatrix["permission_type"]
+  ) => {
     try {
       await routingMatrixService.update(requestTypeId, role, permissionType);
 
       // Update local state
-      setRoutingMatrix(prev => {
+      setRoutingMatrix((prev) => {
         const existingIndex = prev.findIndex(
-          item => item.request_type_id === requestTypeId && item.role === role
+          (item) => item.request_type_id === requestTypeId && item.role === role
         );
-        
+
         if (existingIndex >= 0) {
           const updated = [...prev];
-          updated[existingIndex] = { ...updated[existingIndex], permission_type: permissionType };
+          updated[existingIndex] = {
+            ...updated[existingIndex],
+            permission_type: permissionType
+          };
           return updated;
         } else {
-          return [...prev, {
-            id: crypto.randomUUID(),
-            request_type_id: requestTypeId,
-            role,
-            permission_type: permissionType,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }];
+          return [
+            ...prev,
+            {
+              id: crypto.randomUUID(),
+              request_type_id: requestTypeId,
+              role,
+              permission_type: permissionType,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+          ];
         }
       });
 
       toast({
         title: "Succès",
-        description: "Matrice de routage mise à jour",
+        description: "Matrice de routage mise à jour"
       });
     } catch (error) {
-      console.error('Error updating routing matrix:', error);
+      console.error("Error updating routing matrix:", error);
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour la matrice de routage",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
 
-  const addRequestType = async (requestType: Omit<RequestType, 'id' | 'created_at' | 'updated_at'>) => {
+  const addRequestType = async (requestType) => {
     try {
       const data = await requestTypesService.add(requestType);
-      setRequestTypes(prev => [...prev, data]);
-      
+
       toast({
         title: "Succès",
-        description: "Type de demande ajouté",
+        description: "Type de demande ajouté"
       });
-      
-      return data;
+
+      return true;
     } catch (error) {
-      console.error('Error adding request type:', error);
+      console.error("Error adding request type:", error);
       toast({
         title: "Erreur",
         description: "Impossible d'ajouter le type de demande",
-        variant: "destructive",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const updateRequestType = async ( category_id : string , requestType) => {
+    try {
+      const data = await requestTypesService.update( category_id , requestType);
+
+      toast({
+        title: "Succès",
+        description: "Type de demande mis à jour"
+      });
+
+      return true;
+    } catch (error) {
+      console.error("Error updating request type:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour le type de demande",
+        variant: "destructive"
       });
     }
   };
@@ -109,42 +175,42 @@ export const useRoutingMatrix = () => {
   const deleteRequestType = async (id: string) => {
     try {
       await requestTypesService.delete(id);
-      setRequestTypes(prev => prev.filter(type => type.id !== id));
-      
+
       toast({
         title: "Succès",
-        description: "Type de demande supprimé",
+        description: "Type de demande supprimé"
       });
     } catch (error) {
-      console.error('Error deleting request type:', error);
+      console.error("Error deleting request type:", error);
       toast({
         title: "Erreur",
         description: "Impossible de supprimer le type de demande",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
+  
 
-  const updateEscalationRule = async (id: string, updates: Partial<EscalationRule>) => {
+  const updateEscalationRule = async (updates) => {
     try {
-      await escalationRulesService.update(id, updates);
+      await escalationRulesService.update(updates);
 
-      setEscalationRules(prev => 
-        prev.map(rule => 
-          rule.id === id ? { ...rule, ...updates } : rule
-        )
-      );
+      // setEscalationRules(prev =>
+      //   prev.map(rule =>
+      //     rule.id === id ? { ...rule, ...updates } : rule
+      //   )
+      // );
 
       toast({
         title: "Succès",
-        description: "Règle d'escalade mise à jour",
+        description: "Règle d'escalade mise à jour"
       });
     } catch (error) {
-      console.error('Error updating escalation rule:', error);
+      console.error("Error updating escalation rule:", error);
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour la règle d'escalade",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
@@ -156,10 +222,11 @@ export const useRoutingMatrix = () => {
     loading,
     updateRoutingMatrix,
     addRequestType,
+    updateRequestType,
     deleteRequestType,
     updateEscalationRule,
     getPermissionIcon,
-    getPermissionForRole: (requestTypeId: string, role: string) => 
+    getPermissionForRole: (requestTypeId: string, role: string) =>
       getPermissionForRole(routingMatrix, requestTypeId, role),
     refetch: fetchData
   };
